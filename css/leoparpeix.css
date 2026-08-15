@@ -627,33 +627,6 @@ header[data-theme="light"].scrolled {
   display: flex;
   align-items: center;
   gap: 6px;
-  /* 给右上角悬浮的音乐播放器预留空间，避免按钮被遮挡 */
-  padding-right: 350px;
-}
-
-/* ---------- 顶部音乐播放器（网易云外链，固定悬浮右上角）---------- */
-.music-player {
-  position: fixed;
-  top: 10px;
-  right: 12px;
-  z-index: 200;
-  width: 330px;
-  height: 86px;
-  overflow: hidden;
-  border-radius: 10px;
-  box-shadow: 0 6px 24px rgba(2,32,28,0.12);
-  line-height: 0;
-  pointer-events: auto;
-}
-.music-player iframe {
-  display: block;
-  width: 330px;
-  height: 86px;
-  border: 0;
-}
-@media (max-width: 720px) {
-  .music-player { display: none; }
-  .header-right { padding-right: 0; }
 }
 
 /* ---------- 音效开关按钮 ---------- */

@@ -13,6 +13,9 @@
   /* ========== 全局状态 ========== */
   var renderer, scene, camera, bee, beeWings = [];
   var clock, canvas;
+  var soundOn = false;
+  var audioCtx = null;
+  var buzzOsc = null, buzzGain = null;
   var active = false;
 
   var beeVelocity = new THREE.Vector3();
@@ -199,6 +202,11 @@
       w.material.opacity = 0.3 + flap * 0.3;
       w.rotation.x = (i === 0 ? 1 : -1) * flap * 0.45;
     }
+
+    /* 嗡嗡声 */
+    if (soundOn) {
+      setBuzzIntensity(Math.min(1, beeVelocity.length() / 4));
+    }
   }
 
   /* ========== 文字翻转交互 ========== */
@@ -292,6 +300,58 @@
     }, FLIP_DUR);
   }
 
+  /* ========== 音效 ========== */
+  function initAudio() {
+    if (audioCtx) return;
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+  }
+
+  function startBuzz() {
+    if (!audioCtx || !soundOn || buzzOsc) return;
+    buzzOsc = audioCtx.createOscillator();
+    buzzGain = audioCtx.createGain();
+    buzzOsc.type = 'sawtooth';
+    buzzOsc.frequency.value = 180;
+    buzzGain.gain.value = 0;
+    buzzOsc.connect(buzzGain);
+    buzzGain.connect(audioCtx.destination);
+    buzzOsc.start();
+    buzzGain.gain.linearRampToValueAtTime(0.012, audioCtx.currentTime + 0.3);
+  }
+
+  function stopBuzz() {
+    if (!buzzOsc || !audioCtx) return;
+    buzzGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2);
+    var osc = buzzOsc;
+    setTimeout(function () { try { osc.stop(); } catch (e) {} }, 300);
+    buzzOsc = null;
+    buzzGain = null;
+  }
+
+  function setBuzzIntensity(d) {
+    if (!buzzGain || !audioCtx) return;
+    buzzGain.gain.linearRampToValueAtTime(0.006 + d * 0.019, audioCtx.currentTime + 0.1);
+    if (buzzOsc) buzzOsc.frequency.linearRampToValueAtTime(160 + d * 60, audioCtx.currentTime + 0.1);
+  }
+
+  function setupSoundToggle() {
+    var btn = document.querySelector('.sound-btn');
+    if (!btn) return;
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      soundOn = !soundOn;
+      btn.classList.toggle('active', soundOn);
+      if (soundOn) {
+        initAudio();
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        if (active) startBuzz();
+      } else {
+        stopBuzz();
+      }
+    });
+  }
+
   /* ========== 渲染循环 ========== */
   /* 蜜蜂是全屏常驻装饰，滚动时用户期望它照常飞动，故不做「滚动暂停渲染」
      （那样会造成明显的静止/跳变感）。仅当标签页不可见时彻底停渲染，省电且无感知。 */
@@ -321,6 +381,7 @@
   function start() {
     initThree();
     setupTextInteraction();
+    setupSoundToggle();
 
     /* 保存原始HTML用于翻转恢复 */
     document.querySelectorAll('.hd-clickable').forEach(function (el) {
@@ -332,11 +393,12 @@
       var obs = new MutationObserver(function () {
         if (preloader.classList.contains('done') || !preloader.parentNode) {
           active = true;
+          if (soundOn) startBuzz();
           obs.disconnect();
         }
       });
       obs.observe(preloader, { attributes: true, childList: true, subtree: true });
-      setTimeout(function () { active = true; }, 5000);
+      setTimeout(function () { active = true; if (soundOn) startBuzz(); }, 5000);
     } else {
       active = true;
     }

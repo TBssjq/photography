@@ -1,4 +1,4 @@
-﻿# ================================================================
+# ================================================================
 # Photography site - shared build logic (reused by start.bat / deploy.ps1)
 # Provides: Find-Go (locate Go), Build-Site (generate dist/),
 #           Build-Exe (compile server.exe), Stop-Port (free occupied port)
