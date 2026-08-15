@@ -1,0 +1,452 @@
+/* ================================================================
+   隋北 — 特效层（液态玻璃 · 暖琥珀主题）
+   玻璃质感是本站视觉核心：半透磨砂 + 内描边高光 + 柔和外影。
+   全部统一为暖白/琥珀色系，避免冷科技感。
+   ================================================================ */
+
+/* ---------- 通用液态玻璃底层 ---------- */
+.glass {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 1px rgba(26, 23, 20, 0.05),
+    0 8px 30px rgba(26, 23, 20, 0.12);
+}
+
+/* ---------- Hero 按钮：液态玻璃胶囊 + 顶部高光环 ---------- */
+.hero-actions .btn {
+  border-radius: 9999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.55) !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 0 -10px 18px rgba(181, 104, 59, 0.06),
+    0 8px 26px rgba(26, 23, 20, 0.28);
+  overflow: hidden;
+  position: relative;
+}
+.hero-actions .btn::before {
+  content: '';
+  position: absolute; left: 10%; right: 10%; top: 7%;
+  height: 32%;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.85), rgba(255,255,255,0));
+  border-radius: 9999px;
+  pointer-events: none;
+  transition: opacity .4s var(--ease);
+}
+.hero-actions .btn span:not(.glass-ring) { position: relative; z-index: 2; }
+.hero-actions .btn:hover {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(255, 255, 255, 0.75) !important;
+}
+.hero-actions .btn.ghost {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.35),
+    0 8px 26px rgba(26, 23, 20, 0.22);
+}
+.hero-actions .btn.ghost::before { opacity: .4; }
+.hero-actions .btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: var(--ink) !important;
+}
+
+/* ---------- 卡片悬停信息层：液态玻璃 ---------- */
+.card .overlay {
+  background:
+    linear-gradient(to top, rgba(26, 23, 20, 0.55) 0%, rgba(26, 23, 20, 0.05) 55%, transparent 100%),
+    rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* ---------- 卡片悬停操作钮：圆玻璃钮 ---------- */
+.ca-btn {
+  border-radius: 50% !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  color: var(--ink);
+  font-size: 12px;
+  font-family: var(--sans);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    0 4px 14px rgba(26, 23, 20, 0.18);
+  transition: background 0.25s, color 0.25s, transform 0.2s, box-shadow 0.25s;
+}
+.ca-btn:hover {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(181, 104, 59, 0.4);
+}
+
+/* ---------- 灯箱关闭 / 导航：圆玻璃钮 ---------- */
+.lb-close, .lb-nav {
+  border-radius: 50% !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    0 6px 20px rgba(26, 23, 20, 0.2);
+  transition: background 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.lb-close:hover, .lb-nav:hover {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  transform: scale(1.06);
+}
+.lb-nav:hover::before { border-color: #fff !important; }
+.lb-close:hover::before, .lb-close:hover::after { background: #fff; }
+
+/* ---------- 灯箱分享 / 下载按钮：玻璃实色 ---------- */
+.lb-act {
+  border-radius: 9999px !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.2s;
+}
+.lb-act[data-act="share"] {
+  border: 1px solid rgba(158, 86, 48, 0.5);
+  background: rgba(158, 86, 48, 0.92);
+  color: #fff;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.25), 0 4px 14px rgba(181,104,59,0.3);
+}
+.lb-act[data-act="share"]:hover { background: var(--accent); border-color: var(--accent); transform: translateY(-1px); }
+.lb-act[data-act="download"] {
+  border: 1px solid rgba(26, 23, 20, 0.25);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--ink-2);
+}
+.lb-act[data-act="download"]:hover { border-color: var(--accent); color: var(--accent-ink); background: rgba(255,255,255,0.9); }
+
+/* ---------- 返回顶部：玻璃圆钮 ---------- */
+.back-top {
+  border-radius: 50% !important;
+  border: 1px solid rgba(255, 255, 255, 0.55) !important;
+  background: rgba(26, 23, 20, 0.82) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.18),
+    0 8px 24px rgba(26, 23, 20, 0.28);
+  transition: background 0.3s var(--ease), transform 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+.back-top svg { color: #fff !important; position: relative; z-index: 2; }
+.back-top:hover { background: var(--accent) !important; border-color: var(--accent) !important; }
+.back-top:hover svg { transform: translateY(-3px); }
+
+/* ---------- 后台入口：玻璃胶囊 ---------- */
+.admin-entry {
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    0 4px 16px rgba(26, 23, 20, 0.12);
+}
+.admin-entry:hover { color: var(--accent-ink) !important; border-color: var(--accent) !important; }
+
+/* ---------- 筛选器 Chip：玻璃描边胶囊 ---------- */
+.chip {
+  border: 1px solid rgba(26, 23, 20, 0.14) !important;
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 1px 3px rgba(26,23,20,0.05);
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease), background 0.3s var(--ease);
+}
+.chip:hover { border-color: var(--ink-3) !important; background: rgba(255,255,255,0.8) !important; }
+.chip.active { color: #fff !important; background: rgba(26,23,20,0.9) !important; border-color: rgba(26,23,20,0.9) !important; }
+.tag-chip.active { color: #fff !important; background: rgba(158, 86, 48, 0.95) !important; border-color: rgba(158, 86, 48, 0.95) !important; }
+
+/* ---------- 筛选下拉：玻璃白底 ---------- */
+.filter-select {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(26, 23, 20, 0.14) !important;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.6);
+}
+.filter-select:hover { border-color: var(--ink-3) !important; }
+.filter-select:focus { outline: none; border-color: var(--accent); }
+
+/* ---------- 分享弹窗：玻璃卡片 ---------- */
+.sp-opt {
+  border: 1px solid rgba(26, 23, 20, 0.14) !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 1px 4px rgba(26,23,20,0.05);
+  transition: border-color 0.25s, color 0.25s, background 0.25s, transform 0.2s;
+}
+.sp-opt:hover { border-color: var(--accent) !important; color: var(--accent-ink) !important; background: rgba(255,255,255,0.9) !important; transform: translateY(-2px); }
+.sp-close {
+  border-radius: 50% !important;
+  border: 1px solid rgba(26, 23, 20, 0.14) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 2px 6px rgba(26,23,20,0.08);
+}
+.sp-close:hover { background: var(--accent); color: #fff; }
+.sp-box {
+  border: 1px solid rgba(255, 255, 255, 0.65) !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    var(--shadow-lg);
+}
+
+/* ---------- 联系区标签：玻璃描边胶囊 ---------- */
+.ci-label {
+  border: 1px solid var(--accent-line) !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.6);
+  transition: color 0.3s, background 0.3s, border-color 0.3s;
+}
+.ci-link:hover .ci-label { background: var(--accent-ink); color: #fff; border-color: var(--accent-ink); }
+
+/* ---------- 页脚链接：玻璃胶囊 ---------- */
+footer .links a {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: none;
+  transition: color 0.3s, background 0.3s;
+}
+footer .links a:hover { background: var(--accent); color: #fff; }
+
+/* ---------- 移动菜单 / 菜单按钮：玻璃白胶囊 ---------- */
+.menu-btn {
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.9), 0 2px 6px rgba(26,23,20,0.06);
+}
+.mobile-nav a {
+  border: 1px solid var(--line-2);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: none;
+  transition: color 0.3s, background 0.3s, border-color 0.3s;
+}
+.mobile-nav a:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ---------- 友情链接标签：玻璃 ---------- */
+.flink {
+  border: 1px solid var(--accent-line) !important;
+  background: var(--accent-soft) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.5);
+  transition: background 0.25s, color 0.25s, transform 0.2s;
+}
+.flink:hover { background: var(--accent); color: #fff !important; transform: translateY(-1px); }
+
+/* ---------- 预加载进度条 ---------- */
+.preloader-bar { height: 2px !important; background: var(--line-2) !important; border-radius: 0 !important; overflow: hidden; }
+.preloader-fill { box-shadow: 0 0 8px var(--accent-glow) !important; }
+
+/* ---------- 分阶段「加载到哪一步」指示器 ---------- */
+.preloader-steps {
+  list-style: none; margin: 16px 0 2px; padding: 0;
+  display: flex; flex-direction: column; gap: 9px; align-items: flex-start; width: 100%;
+}
+.preloader-step {
+  display: flex; align-items: center; gap: 11px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+  color: var(--ink-3); opacity: .4;
+  transform: translateX(0);
+  transition: opacity .45s var(--ease), color .45s var(--ease), transform .45s var(--ease);
+}
+.preloader-step .ps-dot {
+  position: relative; width: 7px; height: 7px; border-radius: 50%;
+  border: 1px solid var(--ink-3); background: transparent; flex: 0 0 auto;
+  transition: border-color .4s, background .4s, box-shadow .4s;
+}
+.preloader-step.active { opacity: 1; color: var(--ink); transform: translateX(4px); }
+.preloader-step.active .ps-dot {
+  border-color: var(--accent); background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+.preloader-step.active .ps-dot::after {
+  content: ''; position: absolute; inset: -4px; border-radius: 50%;
+  border: 1px solid var(--accent); opacity: .5;
+  animation: psPulse 1.4s ease-out infinite;
+}
+.preloader-step.done { opacity: .85; color: var(--ink-2); }
+.preloader-step.done .ps-dot { border-color: var(--accent); background: var(--accent); }
+@keyframes psPulse {
+  0%   { transform: scale(.7); opacity: .6; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .preloader-step.active .ps-dot::after { animation: none; }
+  .preloader-step { transition: opacity .2s, color .2s; transform: none; }
+}
+
+/* ---------- 磁吸动画过渡 ---------- */
+[data-magnetic] {
+  transition: translate 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+              background 0.3s var(--ease),
+              box-shadow 0.3s var(--ease),
+              border-color 0.3s var(--ease),
+              color 0.3s var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0.01ms !important; }
+  [data-magnetic] { translate: none !important; }
+}
+
+/* ============================================================
+ * portfolio3d.js 配套样式（学习自 3D-Dev-Portfolio-main）
+ * ============================================================ */
+
+/* ---------- 1) Marquee 无限滚动（GSAP 接管 xPercent 平移） ---------- */
+.marquee-track { will-change: transform; } /* 替代原 CSS @keyframes marquee，由 portfolio3d.js 驱动 */
+
+/* ---------- 2) Gradient 球体浮动光晕（替代 Three.js WebGL） ---------- */
+.gp-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.gp-sphere {
+  position: absolute;
+  width: 46vmin;
+  height: 46vmin;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.85;
+  mix-blend-mode: screen;
+  will-change: transform;
+}
+/* 让氛围光球在内容之下 */
+#hero, .featured, #contact, .about { position: relative; }
+#hero > .gp-layer, .featured > .gp-layer, #contact > .gp-layer, .about > .gp-layer { z-index: 0; }
+
+/* ---------- 3) Gradient 文字裁切 ---------- */
+.gradient-text {
+  background: linear-gradient(110deg, var(--accent-ink) 0%, var(--accent) 38%, #ffb27a 60%, var(--accent-ink) 100%);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: gradTextFlow 6s ease-in-out infinite;
+}
+@keyframes gradTextFlow {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
+
+/* ---------- 4) Bento 卡片箭头位移 ---------- */
+.bento-arrow {
+  display: inline-block;
+  font-size: 1.1em;
+  line-height: 1;
+  color: var(--accent);
+  will-change: transform;
+  margin-left: auto;
+}
+.gear-item, .archive-row, .contact-item, .featured-side .ci-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---------- 5) Showcase Carousel（按钮/hover 由 JS 驱动 x 位移） ---------- */
+.showcase-stage.carousel-mode { display: flex; will-change: transform; }
+
+/* ============================================================
+ * fx-suite.js 配套样式（综合三套已学项目 + 新增）
+ * ============================================================ */
+
+/* ---------- 1) reveal-text 词级上浮揭示 ---------- */
+.reveal-text .rt-word { display: inline-block; will-change: transform; }
+.reveal-text { will-change: transform; }
+
+/* ---------- 2) parallax 视差图层（由 JS 设置 data-parallax 驱动 yPercent） ---------- */
+[data-parallax] { will-change: transform; display: inline-block; }
+
+/* ---------- 3) 统一卡片 3D tilt（gear-item / archive-item / featured-img-wrap / about-img） ---------- */
+.gear-item, .archive-item, .featured-img-wrap, .about-img, .testimonial-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ---------- 4) shine-img 图片斜向高光扫过 ---------- */
+.shine-img { position: relative; overflow: hidden; display: block; }
+.shine-sweep {
+  position: absolute;
+  top: 0; left: 0;
+  width: 60%; height: 60%;
+  background: linear-gradient(115deg, transparent, rgba(255,255,255,0.55), transparent);
+  transform: translate(-130%, -130%);
+  pointer-events: none;
+  filter: blur(3px);
+  z-index: 2;
+}
+
+/* ---------- 6) btn-shine 按钮光泽扫过 ---------- */
+.btn-shine-host { position: relative; overflow: hidden; }
+.btn-shine {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 45%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.5), transparent);
+  transform: skewX(-18deg);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ============================================================
+ * fx-suite 新增（F/G）：浮动预览图 + reveal-rise
+ * 来源 awwwards-portfolio-main
+ * ============================================================ */
+
+/* ---------- F) 浮动预览图层（跟随鼠标） ---------- */
+.fp-layer {
+  position: fixed;
+  top: 0; left: 0;
+  width: 300px; height: 210px;
+  border-radius: 6px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 9000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(0, 0) scale(0.92);
+  box-shadow: 0 18px 50px rgba(26, 23, 20, 0.35);
+  will-change: transform;
+}
+.fp-layer img, .fp-layer video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---------- G) reveal-rise 大标题从下方整段滑入（防初始闪烁） ---------- */
+.reveal-rise { will-change: transform, opacity; }

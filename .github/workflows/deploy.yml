@@ -1,0 +1,66 @@
+# GitHub Actions: 自动构建并部署到 GitHub Pages
+#
+# 工作流程：
+# 1. 推送代码到 main 分支
+# 2. GitHub 自动用 Go 构建静态网站
+# 3. 部署 dist/ 目录到 GitHub Pages
+#
+# 前提：
+# - 仓库 Settings → Pages → Source 选 "GitHub Actions"
+# - 仓库 Settings → Actions → General → Workflow permissions 选 "Read and write"
+
+name: Build and Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # 支持手动触发
+  workflow_dispatch:
+
+# 允许 GitHub Pages 部署权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同一时间只运行一个部署
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: 构建静态网站
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Go 环境
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: 构建
+        working-directory: ./backend
+        run: go run main.go build
+
+      - name: 上传构建产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    name: 部署到 GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: 部署
+        id: deployment
+        uses: actions/deploy-pages@v4

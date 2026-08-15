@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ .Data.Site.Title }}</title>
+<meta name="description" content="{{ .Data.Site.Description }}">
+<meta name="author" content="{{ .Data.Site.Author }}">
+<meta name="theme-color" content="#F5F5F0">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ .Data.Site.Title }}">
+<meta property="og:description" content="{{ .Data.Site.Description }}">
+<meta property="og:image" content="{{ .Data.Hero.Bg }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ .Data.Site.Title }}">
+<meta name="twitter:description" content="{{ .Data.Site.Description }}">
+<meta name="twitter:image" content="{{ .Data.Hero.Bg }}">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23F5F5F0'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23B5683B' stroke-width='3'/%3E%3Ccircle cx='50' cy='50' r='5' fill='%23B5683B'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/effects.css">
+<link rel="stylesheet" href="css/leoparpeix.css">
+</head>
+<body>
+
+<!-- ============ Preloader ============ -->
+<div class="preloader" id="preloader">
+  <div class="preloader-inner">
+    <div class="preloader-logo">隋<span>北</span></div>
+    <div class="preloader-bar"><div class="preloader-fill" id="preloaderFill"></div></div>
+    <div class="preloader-count" id="preloaderCount">0</div>
+  </div>
+</div>
+
+<!-- ============ Scroll Progress ============ -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- ============ Custom Cursor ============ -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ============ Back to Top ============ -->
+<button class="back-top" id="backTop" aria-label="back to top" data-magnetic>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<!-- ============ Header ============ -->
+<header id="header" data-theme="light">
+  <a href="#" class="logo">隋<span>北</span></a>
+  <nav>
+    <a href="#gallery">作品</a>
+    <a href="#about">关于</a>
+    <a href="#contact">联系</a>
+  </nav>
+  <div class="header-right">
+    <button class="sound-btn" id="soundBtn" aria-label="toggle sound" data-magnetic>
+      <svg viewBox="0 0 24 24">
+        <path d="M3 9v6h4l5 4V5L7 9H3z"/>
+        <line class="sound-off-bar" x1="2" y1="3" x2="22" y2="21" stroke-width="2"/>
+        <path class="sound-on-wave" d="M16 8a5 5 0 0 1 0 8" opacity="0"/>
+        <path class="sound-on-wave" d="M18.5 5.5a9 9 0 0 1 0 13" opacity="0"/>
+      </svg>
+    </button>
+    <button class="menu-btn" id="menuBtn" aria-label="menu" data-magnetic><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <a href="#gallery" data-magnetic>作品</a>
+  <a href="#about" data-magnetic>关于</a>
+  <a href="#contact" data-magnetic>联系</a>
+</div>
+
+<!-- ============ Hero (leoparpeix style · pure typography) ============ -->
+<section class="hero" id="hero" data-theme-section="light">
+  <!-- 角落定位文字 -->
+  <div class="hero-corner tl">
+    <div class="hc-label">Raised in China</div>
+    <div>Shooting worldwide</div>
+    <div style="margin-top:8px; font-family:var(--display); font-size:15px; font-weight:600; color:var(--ink);">隋北 / Sui Bei</div>
+  </div>
+  <div class="hero-corner tr">
+    <div class="hc-label">Currently</div>
+    <div>Capturing light & shadow</div>
+    <div style="margin-top:8px; color:var(--ink-3); font-size:12px;">Former: <a href="#">Photography Studio</a></div>
+  </div>
+  <div class="hero-corner bl">
+    <div class="hc-label">Based in</div>
+    <div>中国</div>
+  </div>
+  <div class="hero-corner br">
+    <div class="hc-label">Vol.</div>
+    <div style="font-family:var(--display); font-size:16px; font-weight:600;">01 / 2026</div>
+  </div>
+
+  <!-- 中央巨型排版 -->
+  <div class="hero-center">
+    <span class="hero-asterisk">*</span>
+    <div class="hero-display" id="heroDisplay">
+      <span class="hd-line hd-clickable" data-flip-text="创 意"><span>CREATIVE</span></span>
+      <span class="hd-line hd-clickable" data-flip-text="热 忱"><span class="hd-accent">PASSIONATE</span></span>
+      <span class="hd-line hd-clickable" data-flip-text="LIGHT HUNTER"><span class="hd-outline">光 影 捕 手</span></span>
+    </div>
+  </div>
+
+  <div class="scroll-ind scroll-ind-enhanced" id="scrollIndEnhanced" aria-hidden="true">
+    <span class="scroll-text">向下滚动</span>
+    <span class="scroll-arrow">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M12 5v14M6 13l6 6 6-6"/>
+      </svg>
+    </span>
+  </div>
+</section>
+
+<!-- ============ Marquee ============ -->
+<div class="marquee" aria-hidden="true" data-theme-section="light">
+  <div class="marquee-track">
+    <span>隋北</span><span class="dot"></span><span>PHOTOGRAPHY</span><span class="dot"></span><span>光影作品集</span><span class="dot"></span><span>2026</span><span class="dot"></span><span>隋北</span><span class="dot"></span><span>PHOTOGRAPHY</span><span class="dot"></span><span>光影作品集</span><span class="dot"></span><span>2026</span><span class="dot"></span>
+  </div>
+</div>
+
+<!-- ============ Featured Showcase ============ -->
+<section class="featured" id="featured" data-theme-section="light">
+  <div class="wrap">
+    <div class="featured-list" id="featuredList">
+      {{ range $i, $f := .Data.Featured }}
+      <div class="featured-row" data-tilt>
+        <div class="fr-media">
+          <img src="{{ $f.Img }}" alt="{{ $f.Title }}" loading="lazy">
+        </div>
+        <div class="fr-text">
+          {{ if $f.Kicker }}<span class="kicker">{{ $f.Kicker }}</span>{{ end }}
+          {{ if $f.Title }}<h3>{{ $f.Title }}</h3>{{ end }}
+          {{ if $f.Desc }}<p>{{ $f.Desc }}</p>{{ end }}
+        </div>
+      </div>
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+<!-- ============ Dedication ============ -->
+<section class="dedication" data-theme-section="light">
+  <div class="wrap" style="text-align:center;">
+    <div class="rule" style="margin:0 auto 44px; max-width:200px;"></div>
+    <p style="font-family:var(--serif); font-style:italic; font-size:clamp(22px,3vw,30px); color:var(--ink);" class="split">谨以此站献给我的挚友 <em style="font-style:normal; font-weight:600; color:var(--accent); border-bottom:1px solid var(--accent); padding-bottom:2px;">隋北</em></p>
+    <p style="font-size:14px; color:var(--ink-3); letter-spacing:.1em; margin-top:12px;">生日快乐 · 愿光影永伴你行</p>
+    <div class="rule" style="margin:44px auto 0; max-width:200px;"></div>
+  </div>
+</section>
+
+<!-- ============ Hero Showcase（不规则重贴图片墙，悬停前置） ============ -->
+<section class="showcase" id="showcase" aria-label="作品精选" data-theme-section="light">
+  <div class="wrap">
+    <div class="showcase-head reveal">
+      <p class="kicker">Selected Works</p>
+      <h2 class="showcase-title split">光影精选</h2>
+      <p class="showcase-sub word-reveal">把光标移到任意照片上，它会被优先点亮。</p>
+    </div>
+    <div class="showcase-stage" id="showcaseStage">
+      <!-- js/data.js -> renderShowcase() 注入重贴卡片 -->
+      <div class="showcase-empty" id="showcaseEmpty">暂无作品</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Horizontal Scroll Featured Works ============ -->
+<section class="hs-section" id="hsSection" data-theme-section="light">
+  <div class="hs-sticky">
+    <div class="hs-header">
+      <div>
+        <div class="sec-num">01 — SELECTED WORKS</div>
+        <div class="kicker">Horizontal Scroll</div>
+        <h2 class="word-reveal">光影横向</h2>
+      </div>
+      <div class="hs-counter">
+        <span class="hs-current">01</span>
+        <span>/ <span id="hsTotal">06</span></span>
+      </div>
+    </div>
+    <div class="hs-track" id="hsTrack">
+      <!-- js/data.js -> renderHorizontalScroll() 注入 -->
+    </div>
+    <div class="hs-progress"><div class="hs-progress-fill" id="hsProgressFill"></div></div>
+    <div class="hs-hint">Scroll to explore</div>
+  </div>
+</section>
+
+<!-- ============ Gallery ============ -->
+<section id="gallery" data-theme-section="light">
+  <div class="gallery-head">
+    <div class="sec-head">
+      <div class="sec-num">01 — PORTFOLIO</div>
+      <div class="kicker">Portfolio</div>
+      <h2 class="stroke-reveal">精选作品集</h2>
+      <p>涵盖人像、自然与城市。按栏目、拍摄年份或标签自由筛选，找到你想看的那束光。</p>
+    </div>
+    <div class="gallery-count">
+      <span class="count-num" id="galleryCount">0</span>
+      <span class="count-label">Works</span>
+    </div>
+  </div>
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="galleryGrid"></div>
+  <div class="grid-empty" id="gridEmpty" style="display:none;"><p>该分类暂无作品</p></div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ============ Oversized Display Type ============ -->
+<section class="display-type" data-theme-section="dark">
+  <div class="display-words" id="displayWords">
+    <span class="dw-line"><span>光</span></span>
+    <span class="dw-line"><span class="dw-accent">影</span> <span>捕</span></span>
+    <span class="dw-line"><span>手</span></span>
+    <span class="dw-line"><span class="dw-outline">时间</span> <span class="dw-outline">收藏家</span></span>
+  </div>
+  <p class="display-sub">LIGHT · SHADOW · TIME · COLLECTOR</p>
+</section>
+
+<!-- ============ Quote / Philosophy ============ -->
+<section class="quote-section" data-theme-section="light">
+  <div class="quote-inner reveal">
+    <div class="quote-mark">&ldquo;</div>
+    <p class="quote-text" id="quoteText">{{ quoteHTML .Data.Quote.Text .Data.Quote.Emphasize }}</p>
+    <div class="quote-line"></div>
+    <span class="quote-author" id="quoteAuthor">{{ .Data.Quote.Author }}</span>
+  </div>
+</section>
+
+<!-- ============ About ============ -->
+<section id="about" data-theme-section="light">
+  <div class="wrap">
+    <div class="about">
+      <div class="about-img reveal">
+        <img src="{{ .Data.About.Img }}" alt="摄影师" id="aboutImg" loading="lazy" data-parallax="0.06">
+        <div class="about-img-tag" id="aboutTag">{{ .Data.About.ImgTag }}</div>
+      </div>
+      <div class="about-text reveal">
+        <div class="sec-num">{{ .Data.About.SecNum }}</div>
+        <div class="kicker">{{ .Data.About.Kicker }}</div>
+        <h2 class="stroke-reveal" id="aboutTitle">{{ .Data.About.Title }}</h2>
+        <div id="aboutBody">
+          {{ range .Data.About.Paragraphs }}<p>{{ . }}</p>{{ end }}
+        </div>
+        <div class="stats" id="aboutStats">
+          {{ range .Data.About.Stats }}
+          <div class="stat"><h4>{{ .Value }}</h4><p>{{ .Label }}</p></div>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Equipment / Gear ============ -->
+<section class="gear-section" data-theme-section="light">
+  <div class="wrap">
+    <div class="gear-head">
+      <div class="sec-num">{{ .Data.Gear.SecNum }}</div>
+      <div class="kicker">{{ .Data.Gear.Kicker }}</div>
+      <h2 class="stroke-reveal" id="gearTitle">{{ .Data.Gear.Title }}</h2>
+      <p id="gearSub">{{ .Data.Gear.Desc }}</p>
+    </div>
+    <div class="gear-list" id="gearList">
+      {{ range .Data.Gear.Items }}
+      <div class="gear-item">
+        <div class="gear-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg></div>
+        <div class="gear-info"><h4>{{ .Name }}</h4><p>{{ .Value }}</p></div>
+      </div>
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+<!-- ============ Contact ============ -->
+<section id="contact" class="contact" data-theme-section="light">
+  <div class="wrap">
+    <div class="sec-num">03 — CONTACT</div>
+    <div class="kicker">Get in Touch</div>
+    <h2 id="contactTitle" class="split">{{ .Data.Contact.Title }}</h2>
+    <p id="contactSub">{{ .Data.Contact.Subtitle }}</p>
+    <div class="contact-list" id="contactList"></div>
+  </div>
+</section>
+
+<!-- ============ Footer ============ -->
+<footer data-theme-section="dark">
+  <div class="footer-wave" aria-hidden="true">
+    <svg preserveAspectRatio="none" id="footer-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2278 683">
+      <defs>
+        <linearGradient id="grad-1" x1="0" y1="0" x2="2278" y2="683" gradientUnits="userSpaceOnUse">
+          <stop offset="0.2" stop-color="#fec5fb"></stop>
+          <stop offset="0.8" stop-color="#00bae2"></stop>
+        </linearGradient>
+      </defs>
+      <path class="footer-svg" id="bouncy-path" fill="url(#grad-1)" d="M0-0.3C0-0.3,464,156,1139,156S2278-0.3,2278-0.3V683H0V-0.3z"/>
+    </svg>
+  </div>
+  <div class="footer-left">
+    <span class="footer-logo">隋北</span>
+    <span class="footer-copy" id="footTagline"></span>
+  </div>
+  <div class="links" id="footer-links"></div>
+  <button class="footer-credits-btn" id="creditsBtn" data-magnetic>Credits</button>
+  <span class="footer-copy" id="footYear">{{ .Data.Footer.Copyright }}</span>
+</footer>
+
+<!-- ============ Credits Popup ============ -->
+<div class="credits-popup" id="creditsPopup">
+  <div class="credits-inner">
+    <button class="credits-close" id="creditsClose" aria-label="close">&times;</button>
+    <h3>Credits</h3>
+    <ul class="credits-list">
+      <li><span class="credit-role">Photography</span><span class="credit-name">隋北</span></li>
+      <li><span class="credit-role">Inspiration</span><span class="credit-name">Léo Parpeix</span></li>
+      <li><span class="credit-role">Smooth Scroll</span><span class="credit-name">Lenis</span></li>
+      <li><span class="credit-role">Occasion</span><span class="credit-name">生日礼物</span></li>
+    </ul>
+    <div class="credits-footer">Made with light & shadow · 2026</div>
+  </div>
+</div>
+
+<!-- ============ Lightbox ============ -->
+<div class="lightbox" id="lightbox">
+  <div class="lb-backdrop" id="lbBackdrop"></div>
+  <button class="lb-close" id="lbClose" aria-label="close" data-magnetic></button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="previous" data-magnetic></button>
+  <div class="lb-stage">
+    <div class="lb-media" id="lbMedia"></div>
+    <div class="lb-info" id="lbInfo">
+      <h3 class="lb-title" id="lbTitle"></h3>
+      <span class="lb-tag" id="lbTag"></span>
+      <p class="lb-note" id="lbNote"></p>
+      <div class="lb-links"></div>
+    </div>
+    <div class="lb-actions" id="lbActions">
+      <button class="lb-act" data-act="share" title="分享" data-magnetic>分享</button>
+      <button class="lb-act" data-act="download" title="下载" data-magnetic>下载</button>
+    </div>
+  </div>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="next" data-magnetic></button>
+  <div class="lb-counter" id="lbCounter"></div>
+  <div class="lb-hint" id="lbHint">← → 切换 · ESC 关闭</div>
+</div>
+
+<!-- ============ Embedded Site Data (SSG) ============ -->
+<script type="application/json" id="site-data">{{ .JSON }}</script>
+
+<!-- ============ Scripts ============ -->
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.25/dist/lenis.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/data.js"></script>
+<script src="js/cursor.js"></script>
+<script src="js/bee3d.js"></script>
+<script src="js/share.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/MorphSVGPlugin.min.js"></script>
+<script src="js/animations.js"></script>
+<script src="js/split-reveal.js"></script>
+<script src="js/footer-bounce.js"></script>
+<script src="js/sakura.js"></script>
+<script src="js/toast-pop.js"></script>
+<script src="js/liquid-glass.js"></script>
+<script src="js/gear-elastic.js"></script>
+<a href="admin.html" class="admin-entry" data-magnetic>后台</a>
+</body>
+</html>

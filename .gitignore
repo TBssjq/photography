@@ -1,0 +1,38 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node
+node_modules/
+
+# Go 构建产物
+backend/photography-ssg.exe
+backend/photography-ssg
+
+# dist 目录由 Go 后端生成，可选择是否纳入版本控制
+# 如果用 GitHub Actions 自动部署，dist/ 不需要提交
+# 如果手动部署（方法 A），也不需要提交 dist/，直接推源码即可
+dist/
+
+# 临时文件
+*.tmp
+*.log
+
+# 本地运行产物（Go server 直接运行生成）
+server.exe
+server.err
+server.log
+
+# CodeBuddy 本地数据
+.codebuddy/
+
+# Release 分发包（由 scripts/release.ps1 生成）
+release/
