@@ -1,0 +1,486 @@
+{
+  "about": {
+    "img": "assets/about-photo.jpg",
+    "imgTag": "隋北 · 个人照片",
+    "kicker": "About",
+    "paragraphs": [
+      "隋北，零五年生的天秤座。第一次摸到相机是初二，借同学的，拍了一棵掉光叶子的树，洗出来居然有点好看，从此就陷进去了。",
+      "他不算天才，就是肯等。为了一张星空能冻一整夜，为了一缕晨雾能四点起床。他说拍照这事急不来，好光都是等出来的。这个站，是给他的十八岁——那些等来的光，总该有个地方住下来。"
+    ],
+    "secNum": "02 — ABOUT",
+    "stats": [
+      {
+        "label": "岁 / 刚启程",
+        "value": "18"
+      },
+      {
+        "label": "年快门龄",
+        "value": "4"
+      },
+      {
+        "label": "台机身走天下",
+        "value": "1"
+      }
+    ],
+    "title": "一个把零花钱都换镜头的人"
+  },
+  "categories": [
+    {
+      "key": "portrait",
+      "label": "人像"
+    },
+    {
+      "key": "nature",
+      "label": "自然"
+    },
+    {
+      "key": "city",
+      "label": "城市"
+    },
+    {
+      "key": "mono",
+      "label": "黑白"
+    },
+    {
+      "key": "video",
+      "label": "视频"
+    }
+  ],
+  "contact": {
+    "contacts": [
+      {
+        "label": "QQ",
+        "url": "",
+        "value": "653294795"
+      },
+      {
+        "label": "微信",
+        "url": "",
+        "value": "隋北_Studio"
+      },
+      {
+        "label": "抖音",
+        "url": "",
+        "value": "@隋北摄影"
+      },
+      {
+        "label": "B站",
+        "url": "",
+        "value": "隋北官方账号"
+      }
+    ],
+    "dedication": "谨以此站，送给十八岁还在等光的隋北。",
+    "subtitle": "约拍、换镜头、纯粹吹水都行。隋北回消息慢，但每条都看。",
+    "title": "想聊聊光，或者别的"
+  },
+  "featured": [
+    {
+      "desc": "凌晨三点出发，在海拔五千的山口等第一缕光。手指冻得按不动快门，但它出来那一下，什么都值了。",
+      "img": "assets/cat-nature.jpg",
+      "kicker": "Featured · 念青唐古拉",
+      "title": "雪线之上的四个小时"
+    },
+    {
+      "desc": "傍晚六点五十分，她转身的瞬间，整条街的路灯都成了她的轮廓。",
+      "img": "assets/cat-portrait.jpg",
+      "kicker": "Portrait · 逆光",
+      "title": "发丝上的金边"
+    },
+    {
+      "desc": "仰头看了很久，才发现这栋楼在中午会自己画出影子。",
+      "img": "assets/cat-city.jpg",
+      "kicker": "Architecture",
+      "title": "混凝土的呼吸"
+    }
+  ],
+  "footer": {
+    "copyright": "© 2026 隋北 · 光影作品集 — 所有光，都曾有人等过"
+  },
+  "gear": {
+    "desc": "不追新，够用就好。下面是陪他走过大多数地方的那几件。",
+    "items": [
+      {
+        "name": "机身",
+        "value": "Sony A7M4"
+      },
+      {
+        "name": "挂机头",
+        "value": "24-70mm f/2.8 GM"
+      },
+      {
+        "name": "人像头",
+        "value": "85mm f/1.4 GM"
+      },
+      {
+        "name": "后期",
+        "value": "LR + 一点点 PS"
+      }
+    ],
+    "kicker": "Gear",
+    "secNum": "04 — GEAR",
+    "title": "他的随身家伙"
+  },
+  "hero": {
+    "bg": "assets/hero-bg.jpg",
+    "btnPrimary": "看作品",
+    "btnSecondary": "认识隋北",
+    "kicker": "Photography Portfolio · 20260813",
+    "subtitle": "不是每张照片都好看，但每一张都等过。等云散、等风停、等那束光刚好落在该落的地方。",
+    "typewriter": [
+      {
+        "text": "在第十八个"
+      },
+      {
+        "em": true,
+        "text": "春天"
+      },
+      {
+        "text": "\n"
+      },
+      {
+        "text": "学会了等一束光"
+      }
+    ]
+  },
+  "photos": [
+    {
+      "cat": "nature",
+      "date": "2024-05",
+      "note": "五月，皖南。雾散得比预报早了半小时，我差点错过。后来明白，好东西都这样，不等人。",
+      "src": "assets/cat-nature.jpg",
+      "tag": "NATURE",
+      "tags": [
+        "山",
+        "雾",
+        "旅行"
+      ],
+      "title": "晨雾山谷"
+    },
+    {
+      "cat": "portrait",
+      "date": "2025-03",
+      "note": "窗边自然光，没打灯。她看镜头那一刻，屋里安静得能听见窗外麻雀。",
+      "src": "assets/cat-portrait.jpg",
+      "tag": "PORTRAIT",
+      "tags": [
+        "人像",
+        "自然光"
+      ],
+      "title": "静谧目光"
+    },
+    {
+      "cat": "city",
+      "date": "2023-11",
+      "note": "天台，晚高峰。车流拉成一条河，养着这座不睡觉的城。",
+      "src": "assets/cat-city.jpg",
+      "tag": "CITY",
+      "tags": [
+        "城市",
+        "夜",
+        "车流"
+      ],
+      "title": "城市脉络"
+    },
+    {
+      "cat": "portrait",
+      "date": "2025-01",
+      "src": "assets/cat-portrait.jpg",
+      "tag": "PORTRAIT",
+      "tags": [
+        "人像",
+        "侧光"
+      ],
+      "title": "侧影"
+    },
+    {
+      "cat": "nature",
+      "date": "2024-07",
+      "note": "徒步三小时才到的野湖，没名字。水太静，云掉进去都没声音。",
+      "src": "assets/cat-nature.jpg",
+      "tag": "NATURE",
+      "tags": [
+        "湖",
+        "山",
+        "徒步"
+      ],
+      "title": "湖光山色"
+    },
+    {
+      "cat": "city",
+      "date": "2023-12",
+      "note": "雨刚停。霓虹倒进积水里，城市有了第二个自己，更好看。",
+      "src": "assets/cat-city.jpg",
+      "tag": "CITY",
+      "tags": [
+        "城市",
+        "夜",
+        "霓虹",
+        "雨"
+      ],
+      "title": "夜色都市"
+    },
+    {
+      "cat": "nature",
+      "date": "2024-09",
+      "src": "assets/cat-nature.jpg",
+      "tag": "NATURE",
+      "tags": [
+        "旷野",
+        "草原"
+      ],
+      "title": "旷野之息"
+    },
+    {
+      "cat": "city",
+      "date": "2024-02",
+      "note": "抬头看了很久，这栋楼在中午会拿影子在地上写字。",
+      "src": "assets/cat-city.jpg",
+      "tag": "CITY",
+      "tags": [
+        "城市",
+        "建筑",
+        "几何"
+      ],
+      "title": "几何建筑"
+    },
+    {
+      "cat": "portrait",
+      "date": "2025-04",
+      "src": "assets/cat-portrait.jpg",
+      "tag": "PORTRAIT",
+      "tags": [
+        "人像",
+        "日常"
+      ],
+      "title": "温柔时光"
+    },
+    {
+      "cat": "nature",
+      "date": "2024-10",
+      "note": "日落时云被染成金红。山那头，是另一段还没拍到的路。",
+      "src": "assets/cat-nature.jpg",
+      "tag": "NATURE",
+      "tags": [
+        "山",
+        "日落",
+        "云"
+      ],
+      "title": "群山日落"
+    },
+    {
+      "cat": "portrait",
+      "date": "2025-02",
+      "src": "assets/cat-portrait.jpg",
+      "tag": "PORTRAIT",
+      "tags": [
+        "人像",
+        "笑容"
+      ],
+      "title": "微笑"
+    },
+    {
+      "cat": "city",
+      "date": "2023-10",
+      "src": "assets/cat-city.jpg",
+      "tag": "CITY",
+      "tags": [
+        "城市",
+        "街拍"
+      ],
+      "title": "街角"
+    },
+    {
+      "cat": "nature",
+      "date": "2024-06",
+      "note": "光从叶缝漏下来，在地上写一些我看不懂、但觉得好看的字。",
+      "src": "assets/cat-nature.jpg",
+      "tag": "NATURE",
+      "tags": [
+        "林",
+        "光",
+        "树"
+      ],
+      "title": "林间光影"
+    },
+    {
+      "cat": "mono",
+      "date": "2024-01",
+      "note": "黑白是去掉颜色后的诚实。没有讨好，只剩结构。",
+      "src": "assets/cat-mono.jpg",
+      "tag": "MONO",
+      "tags": [
+        "黑白",
+        "人像",
+        "结构"
+      ],
+      "title": "沉默之像"
+    },
+    {
+      "cat": "mono",
+      "date": "2024-03",
+      "note": "世界不是非黑即白，中间那堆灰，才是大多数时候的样子。",
+      "src": "assets/cat-mono.jpg",
+      "tag": "MONO",
+      "tags": [
+        "黑白",
+        "抽象",
+        "灰"
+      ],
+      "title": "黑白之间"
+    },
+    {
+      "cat": "nature",
+      "date": "2024-12",
+      "note": "零下二十度。天地间就这一棵树，倔强地站着，像在等谁。",
+      "src": "assets/cat-nature.jpg",
+      "tag": "NATURE",
+      "tags": [
+        "雪",
+        "树",
+        "极寒"
+      ],
+      "title": "雪原孤树"
+    },
+    {
+      "cat": "city",
+      "date": "2023-09",
+      "src": "assets/cat-city.jpg",
+      "tag": "CITY",
+      "tags": [
+        "城市",
+        "雾",
+        "建筑"
+      ],
+      "title": "雾中高楼"
+    },
+    {
+      "cat": "portrait",
+      "date": "2025-05",
+      "note": "六点五十分，她一转身，整条街的灯都成了她的边。",
+      "src": "assets/cat-portrait.jpg",
+      "tag": "PORTRAIT",
+      "tags": [
+        "人像",
+        "逆光",
+        "黄昏"
+      ],
+      "title": "逆光少女"
+    },
+    {
+      "cat": "nature",
+      "date": "2024-08",
+      "note": "曝光三十分钟。原来星星一直在走，只是我们眼睛太慢，看不见。",
+      "src": "assets/cat-nature.jpg",
+      "tag": "NATURE",
+      "tags": [
+        "星",
+        "夜",
+        "长曝光"
+      ],
+      "title": "星轨长河"
+    },
+    {
+      "cat": "city",
+      "date": "2023-08",
+      "note": "楼是城市的树，人是上面的叶，风一吹，各飘各的。",
+      "src": "assets/cat-city.jpg",
+      "tag": "CITY",
+      "tags": [
+        "城市",
+        "建筑",
+        "楼"
+      ],
+      "title": "钢铁森林"
+    },
+    {
+      "cat": "mono",
+      "date": "2024-04",
+      "src": "assets/cat-mono.jpg",
+      "tag": "MONO",
+      "tags": [
+        "黑白",
+        "建筑",
+        "光"
+      ],
+      "title": "光之雕塑"
+    },
+    {
+      "cat": "portrait",
+      "date": "2025-06",
+      "note": "他望着远处，像在想很重要的事。也可能只是发呆。但发呆也挺好。",
+      "src": "assets/cat-portrait.jpg",
+      "tag": "PORTRAIT",
+      "tags": [
+        "人像",
+        "情绪",
+        "侧光"
+      ],
+      "title": "沉思"
+    },
+    {
+      "cat": "nature",
+      "date": "2024-11",
+      "src": "assets/cat-nature.jpg",
+      "tag": "NATURE",
+      "tags": [
+        "沙漠",
+        "曲线",
+        "旅行"
+      ],
+      "title": "沙漠曲线"
+    },
+    {
+      "cat": "city",
+      "date": "2023-07",
+      "note": "雨夜的霓虹淌在地上，城市软了，像个刚哭过的孩子。",
+      "src": "assets/cat-city.jpg",
+      "tag": "CITY",
+      "tags": [
+        "城市",
+        "夜",
+        "霓虹",
+        "雨"
+      ],
+      "title": "霓虹雨夜"
+    },
+    {
+      "cat": "video",
+      "date": "2025-07",
+      "note": "照片定格一瞬，视频把时间放出来走一遍。这段是某个普通傍晚，什么都没发生，又什么都发生了。",
+      "src": "assets/cat-video.jpg",
+      "tag": "VIDEO",
+      "tags": [
+        "视频",
+        "日常",
+        "延时"
+      ],
+      "title": "光影流转",
+      "type": "video"
+    },
+    {
+      "cat": "video",
+      "date": "2025-08",
+      "note": "把城市快进，它的节奏一下子清楚了。人来人往，每个人都是一个音符，走错拍也不碍事。",
+      "src": "assets/cat-video.jpg",
+      "tag": "VIDEO",
+      "tags": [
+        "视频",
+        "城市",
+        "节奏"
+      ],
+      "title": "城市节拍",
+      "type": "video"
+    }
+  ],
+  "quote": {
+    "author": "隋北 · 十八岁写于暗房",
+    "emphasize": "时间就归我了",
+    "text": "我不太会说话，所以把想说的都留在快门里了。按下那一下，时间就归我了。"
+  },
+  "site": {
+    "author": "隋北",
+    "description": "隋北的个人摄影作品集 — 用镜头捕捉光影，用影像书写时间。",
+    "name": "隋北",
+    "title": "隋北 · 光影作品集"
+  }
+}

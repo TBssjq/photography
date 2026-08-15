@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>内容后台 · 隋北摄影站</title>
+<!-- 使用系统字体，避免外部字体加载失败 -->
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<!-- 自定义光标（液态玻璃跟随环，与前端一致） -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<header class="admin-header">
+  <div class="ah-left">
+    <span class="ah-logo">隋<span>北</span></span>
+    <span class="ah-title">内容后台</span>
+  </div>
+  <div class="ah-actions">
+    <span class="ah-status" id="status">未改动</span>
+    <button class="abtn ghost" id="btnReset" data-magnetic>恢复默认</button>
+    <button class="abtn ghost" id="btnExport" data-magnetic>导出 ZIP</button>
+    <button class="abtn" id="btnSave" data-magnetic>保存</button>
+    <a class="abtn ghost" href="index.html" target="_blank" data-magnetic>去网站查看</a>
+  </div>
+</header>
+
+<!-- 小白引导条 -->
+<div class="guide-bar" id="guideBar">
+  <span>改完内容点 <b>保存</b> 即自动重新生成站点；图片可点字段旁的 <b>上传</b> 按钮添加。</span>
+  <button class="gb-close" id="gbClose" aria-label="关闭提示">×</button>
+</div>
+
+<main class="admin-main">
+  <nav class="admin-nav" id="adminNav">
+    <button class="an-item active" data-tab="photos" data-magnetic>作品 Photos</button>
+    <button class="an-item" data-tab="featured" data-magnetic>精选 Featured</button>
+    <button class="an-item" data-tab="categories" data-magnetic>分类 Categories</button>
+    <button class="an-item" data-tab="about" data-magnetic>关于 About</button>
+    <button class="an-item" data-tab="contact" data-magnetic>联系 Contact</button>
+    <button class="an-item" data-tab="gear" data-magnetic>装备 Gear</button>
+    <button class="an-item" data-tab="hero" data-magnetic>首页 Hero</button>
+    <button class="an-item" data-tab="export" data-magnetic>部署 / 导出</button>
+  </nav>
+
+  <section class="admin-content">
+    <!-- 作品 -->
+    <div class="tab-panel active" data-panel="photos">
+      <h2 class="panel-title">作品 Photos</h2>
+      <p class="panel-hint">管理首页作品墙。可增删、批量删除、灯箱预览，图片支持上传。</p>
+      <div class="batch-bar" id="batchBarPhotos">
+        <span class="batch-count" id="batchCountPhotos">已选 0 项</span>
+        <button class="bbtn danger" id="batchDelPhotos" data-magnetic>删除选中</button>
+        <button class="bbtn" id="batchClearPhotos" data-magnetic>取消选择</button>
+      </div>
+      <button class="mini-btn" id="addPhoto" data-action="addPhoto" data-magnetic>+ 新增作品</button>
+      <div id="listPhotos"></div>
+    </div>
+
+    <!-- 精选 -->
+    <div class="tab-panel" data-panel="featured">
+      <h2 class="panel-title">精选 Featured</h2>
+      <p class="panel-hint">首页「精选」展示区，左右交错呈现。</p>
+      <button class="mini-btn" id="addFeatured" data-action="addFeatured" data-magnetic>+ 新增精选</button>
+      <div id="listFeatured"></div>
+    </div>
+
+    <!-- 分类 -->
+    <div class="tab-panel" data-panel="categories">
+      <h2 class="panel-title">分类 Categories</h2>
+      <p class="panel-hint">作品筛选分类。key 为内部标识，label 为显示名。</p>
+      <button class="mini-btn" id="addCategory" data-action="addCategory" data-magnetic>+ 新增分类</button>
+      <div id="listCategories"></div>
+    </div>
+
+    <!-- 关于 -->
+    <div class="tab-panel" data-panel="about">
+      <h2 class="panel-title">关于 About</h2>
+      <p class="panel-hint">个人介绍区块文案与配图。</p>
+      <div id="panelAbout"></div>
+    </div>
+
+    <!-- 联系 -->
+    <div class="tab-panel" data-panel="contact">
+      <h2 class="panel-title">联系 Contact</h2>
+      <p class="panel-hint">联系方式与致语。</p>
+      <div id="panelContact"></div>
+    </div>
+
+    <!-- 装备 -->
+    <div class="tab-panel" data-panel="gear">
+      <h2 class="panel-title">装备 Gear</h2>
+      <p class="panel-hint">随身器材清单。</p>
+      <div id="panelGear"></div>
+    </div>
+
+    <!-- 首页 Hero -->
+    <div class="tab-panel" data-panel="hero">
+      <h2 class="panel-title">首页 Hero</h2>
+      <p class="panel-hint">首屏背景、标语与打字机文字。</p>
+      <div id="panelHero"></div>
+    </div>
+
+    <!-- 导出 -->
+    <div class="tab-panel" data-panel="export">
+      <h2 class="panel-title">部署 / 导出</h2>
+      <p class="panel-hint">保存后会自动重建站点；此处可手动重新构建或导出整站 ZIP。</p>
+      <div class="export-row">
+        <button class="bbtn" id="btnRebuild" data-magnetic>重新构建站点</button>
+        <button class="bbtn" id="btnExportZip" data-magnetic>导出整站 ZIP</button>
+      </div>
+      <pre id="exportBox">保存状态会显示在这里。</pre>
+      <div class="deploy-guide">
+        <h3>如何上线到 GitHub Pages</h3>
+        <ol>
+          <li>在本后台改好内容，点 <b>保存</b>。</li>
+          <li>点 <b>导出 ZIP</b> 下载 <code>suibei-photography.zip</code>。</li>
+          <li>解压后把 <code>dist/</code> 内容推送到 GitHub 仓库的 <code>main</code> 分支。</li>
+          <li>仓库 Settings → Pages → Source 选 <code>GitHub Actions</code> 或 <code>main / root</code>。</li>
+        </ol>
+        <p class="guide-tip">也可直接双击项目根目录的 <code>deploy.ps1</code> 一键发布（需已安装 Git 与 Go）。</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 后台预览灯箱 -->
+<div class="adm-lightbox" id="admLightbox">
+  <div class="adm-lb-backdrop" data-lb-close></div>
+  <button class="adm-lb-close" data-lb-close aria-label="关闭"></button>
+  <div class="adm-lb-stage">
+    <div class="adm-lb-media" id="lbMedia"></div>
+    <div class="adm-lb-info">
+      <div class="adm-lb-title" id="lbTitle"></div>
+      <div class="adm-lb-note" id="lbNote"></div>
+      <div class="adm-lb-actions">
+        <button class="lb-act" data-act="share">复制图片链接</button>
+        <a class="lb-act" data-act="download" id="lbDownload" target="_blank" rel="noopener">下载原图</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="site-data.js"></script>
+<script src="js/cursor.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

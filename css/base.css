@@ -1,0 +1,118 @@
+/* ================================================================
+   隋北 · 光影作品集 — 设计基底
+   主题：奶油纸感 / 深森绿 / leoparpeix 风格
+   字体：Poppins（展示）× Noto Sans/Serif SC（中文）
+   ================================================================ */
+
+:root {
+  /* —— 纸与墨（leoparpeix 奶油+深绿） —— */
+  --paper:    #F5F5F0;   /* 主背景：奶油白 */
+  --paper-2:  #EEEDE7;   /* 次级背景：极淡暖灰 */
+  --paper-3:  #E8E6E0;   /* 卡片/分区底 */
+  --ink:      #02201C;   /* 主文字：深森林绿 */
+  --ink-2:    #2A4540;   /* 次级文字 */
+  --ink-3:    #6B8580;   /* 弱化文字 */
+  --ink-4:    #9AB0AC;   /* 极弱/占位 */
+
+  /* —— 强调：琥珀赭（温暖对比，用于按钮/光标/进度）—— */
+  --accent:   #B5683B;   /* 填充/点缀 */
+  --accent-2: #9E5630;   /* hover 深一档 */
+  --accent-ink: #9E5630; /* 文字强调用深赭 */
+  --accent-soft: rgba(181, 104, 59, 0.12);
+  --accent-glow: rgba(181, 104, 59, 0.30);
+  --accent-line: rgba(181, 104, 59, 0.38);
+  --er-fill: rgba(181, 104, 59, 0.85);
+  --footer-bg: #02201C;  /* 深绿页脚 */
+
+  /* —— 线 / 影 —— */
+  --line:     rgba(2, 32, 28, 0.10);
+  --line-2:   rgba(2, 32, 28, 0.16);
+  --line-strong: rgba(2, 32, 28, 0.22);
+  --bg-soft:  #EEEDE7;
+  --shadow-sm: 0 1px 2px rgba(2,32,28,.05), 0 4px 14px rgba(2,32,28,.05);
+  --shadow:    0 10px 30px rgba(2,32,28,.08);
+  --shadow-lg: 0 30px 80px rgba(2,32,28,.14);
+
+  /* —— 字体 —— */
+  --serif: "Poppins", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  --display: "Poppins", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  --sans:  "Poppins", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", system-ui, sans-serif;
+  --mono:  "SF Mono", "Fira Code", "Cascadia Code", Consolas, "Courier New", monospace;
+  --brush: "Ma Shan Zheng", "STKaiti", "KaiTi", "Noto Serif SC", cursive;
+
+  --pad: 56px;
+  --maxw: 1320px;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 90px; background: var(--paper); -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 400;
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+body:not(.loaded) { overflow: hidden; height: 100vh; }
+::selection { background: var(--accent-ink); color: #fff; }
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; background: none; border: none; }
+
+/* ---------- 预加载 ---------- */
+.preloader { position: fixed; inset: 0; z-index: 99999; background: var(--paper); display: flex; align-items: center; justify-content: center; transition: opacity .9s var(--ease), visibility .9s; }
+.preloader.done { opacity: 0; visibility: hidden; pointer-events: none; }
+.preloader-inner { text-align: center; width: 300px; }
+.preloader-logo { font-family: var(--serif); font-weight: 600; font-size: 30px; letter-spacing: .1em; color: var(--ink); margin-bottom: 30px; }
+.preloader-logo span { color: var(--accent); font-style: italic; font-weight: 400; }
+.preloader-bar { width: 100%; height: 1px; background: var(--line-2); overflow: hidden; margin-bottom: 14px; }
+.preloader-fill { height: 100%; width: 0; background: var(--accent); transition: width .3s ease; }
+.preloader-count { font-family: var(--mono); font-size: 11px; letter-spacing: .3em; color: var(--ink-3); }
+
+/* ---------- 滚动进度（细线，青绿） ---------- */
+.scroll-progress { position: fixed; top: 0; left: 0; width: 0; height: 2px; background: var(--accent); z-index: 9998; transition: width .12s linear; }
+
+/* ---------- 自定义光标 ---------- */
+.cursor-dot { position: fixed; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 10001; transform: translate(-50%,-50%); transition: width .2s, height .2s, opacity .2s; }
+.cursor-ring { position: fixed; width: 34px; height: 34px; border: 1.5px solid var(--accent); border-radius: 50%; pointer-events: none; z-index: 10001; transform: translate(-50%,-50%); opacity: .55; transition: width .25s var(--ease-out), height .25s var(--ease-out), opacity .25s, background .25s, border-color .25s; }
+.cursor-ring.hover { width: 60px; height: 60px; opacity: 1; background: var(--accent-glow); border-color: var(--accent-ink); }
+.cursor-ring.view { width: 84px; height: 84px; opacity: 1; background: var(--accent-glow); border-color: var(--accent-ink); }
+.cursor-ring.view::after { content: 'VIEW'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 10px; letter-spacing: .15em; color: var(--accent); }
+@media (max-width: 768px) { .cursor-dot, .cursor-ring { display: none; } body, a, button { cursor: auto; } }
+
+/* ---------- 排版基元 ---------- */
+.kicker { font-family: var(--mono); font-size: 11px; letter-spacing: .32em; text-transform: uppercase; color: var(--accent-ink); }
+h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; letter-spacing: -.02em; line-height: 1.1; }
+
+/* 标题描边渐显（滚动驱动） */
+.stroke-reveal { color: transparent; -webkit-text-stroke: 1px var(--ink-3); transition: color .9s var(--ease-out); }
+.stroke-reveal.lit { color: var(--ink); -webkit-text-stroke: 1px transparent; }
+/* About 标题较长，未点亮时也更明确地用深一档描边，避免发虚看不清 */
+.about-text h2.stroke-reveal { -webkit-text-stroke-color: var(--ink-2); font-weight: 600; }
+
+/* ---------- 按钮 ---------- */
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 15px 34px; background: var(--ink); color: var(--paper); font-size: 14px; font-weight: 500; letter-spacing: .03em; border-radius: 2px; position: relative; overflow: hidden; transition: transform .35s var(--ease), background .35s, color .35s; will-change: transform; }
+.btn::after { content: ''; position: absolute; inset: 0; background: var(--accent-ink); transform: scaleX(0); transform-origin: left; transition: transform .4s var(--ease-out); z-index: 0; }
+.btn span { position: relative; z-index: 1; }
+.btn:hover { transform: translateY(-2px); }
+.btn:hover::after { transform: scaleX(1); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line-2); }
+.btn.ghost::after { background: var(--ink); }
+.btn.ghost:hover { color: var(--paper); border-color: var(--ink); }
+
+/* ---------- 入场动画基元 ---------- */
+.reveal { opacity: 0; transform: translateY(34px); transition: opacity 1s var(--ease-out), transform 1s var(--ease-out); }
+.reveal.show { opacity: 1; transform: none; }
+
+/* ---------- 后台入口（低调，置于左下角避开浏览器系统按钮） ---------- */
+.admin-entry { position: fixed; left: 18px; bottom: 18px; width: auto; height: 30px; padding: 0 13px; display: flex; align-items: center; justify-content: center; background: var(--paper); border: 1px solid var(--line-2); border-radius: 40px; color: var(--ink-3); font-size: 12px; letter-spacing: .05em; z-index: 90; box-shadow: var(--shadow-sm); transition: transform .35s var(--ease), color .3s, border-color .3s; }
+.admin-entry:hover { transform: translateY(-2px); color: var(--accent); border-color: var(--accent); }
+@media (max-width: 768px) { .admin-entry { left: 14px; bottom: 14px; height: 28px; padding: 0 11px; font-size: 11px; } }
