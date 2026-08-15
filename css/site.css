@@ -31,7 +31,6 @@ header:not(.scrolled) nav a { color: var(--ink-2); }
 header:not(.scrolled) nav a:hover { color: var(--accent-ink); }
 header:not(.scrolled) nav a::after { background: var(--accent-ink); }
 header:not(.scrolled) .menu-btn span { background: var(--ink); }
-header:not(.scrolled) .sound-btn { color: var(--ink-2); }
 header.scrolled { padding: 14px var(--pad); background: rgba(245,245,240,.82); backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%); border-bottom-color: var(--line); box-shadow: inset 0 1px 1px rgba(255,255,255,0.7), 0 6px 24px rgba(2,32,28,0.06); }
 .logo { font-family: var(--display); font-size: 22px; font-weight: 600; letter-spacing: .14em; color: var(--ink); transition: color .5s var(--ease); }
 .logo span { color: var(--accent-ink); font-style: italic; font-weight: 400; transition: color .5s var(--ease); }

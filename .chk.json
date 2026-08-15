@@ -1,6 +1,6 @@
 {
   "about": {
-    "img": "assets/about-photo.jpg",
+    "img": "assets/about-photo.webp",
     "imgTag": "隋北 · 个人照片",
     "kicker": "About",
     "paragraphs": [
@@ -76,19 +76,19 @@
   "featured": [
     {
       "desc": "凌晨三点出发，在海拔五千的山口等第一缕光。手指冻得按不动快门，但它出来那一下，什么都值了。",
-      "img": "assets/cat-nature.jpg",
+      "img": "assets/cat-nature.webp",
       "kicker": "Featured · 念青唐古拉",
       "title": "雪线之上的四个小时"
     },
     {
       "desc": "傍晚六点五十分，她转身的瞬间，整条街的路灯都成了她的轮廓。",
-      "img": "assets/cat-portrait.jpg",
+      "img": "assets/cat-portrait.webp",
       "kicker": "Portrait · 逆光",
       "title": "发丝上的金边"
     },
     {
       "desc": "仰头看了很久，才发现这栋楼在中午会自己画出影子。",
-      "img": "assets/cat-city.jpg",
+      "img": "assets/cat-city.webp",
       "kicker": "Architecture",
       "title": "混凝土的呼吸"
     }
@@ -121,7 +121,7 @@
     "title": "他的随身家伙"
   },
   "hero": {
-    "bg": "assets/hero-bg.jpg",
+    "bg": "assets/hero-bg.webp",
     "btnPrimary": "看作品",
     "btnSecondary": "认识隋北",
     "kicker": "Photography Portfolio · 20260813",
@@ -147,7 +147,7 @@
       "cat": "nature",
       "date": "2024-05",
       "note": "五月，皖南。雾散得比预报早了半小时，我差点错过。后来明白，好东西都这样，不等人。",
-      "src": "assets/cat-nature.jpg",
+      "src": "assets/cat-nature.webp",
       "tag": "NATURE",
       "tags": [
         "山",
@@ -160,7 +160,7 @@
       "cat": "portrait",
       "date": "2025-03",
       "note": "窗边自然光，没打灯。她看镜头那一刻，屋里安静得能听见窗外麻雀。",
-      "src": "assets/cat-portrait.jpg",
+      "src": "assets/cat-portrait.webp",
       "tag": "PORTRAIT",
       "tags": [
         "人像",
@@ -172,7 +172,7 @@
       "cat": "city",
       "date": "2023-11",
       "note": "天台，晚高峰。车流拉成一条河，养着这座不睡觉的城。",
-      "src": "assets/cat-city.jpg",
+      "src": "assets/cat-city.webp",
       "tag": "CITY",
       "tags": [
         "城市",
@@ -184,7 +184,7 @@
     {
       "cat": "portrait",
       "date": "2025-01",
-      "src": "assets/cat-portrait.jpg",
+      "src": "assets/cat-portrait.webp",
       "tag": "PORTRAIT",
       "tags": [
         "人像",
@@ -196,7 +196,7 @@
       "cat": "nature",
       "date": "2024-07",
       "note": "徒步三小时才到的野湖，没名字。水太静，云掉进去都没声音。",
-      "src": "assets/cat-nature.jpg",
+      "src": "assets/cat-nature.webp",
       "tag": "NATURE",
       "tags": [
         "湖",
@@ -209,7 +209,7 @@
       "cat": "city",
       "date": "2023-12",
       "note": "雨刚停。霓虹倒进积水里，城市有了第二个自己，更好看。",
-      "src": "assets/cat-city.jpg",
+      "src": "assets/cat-city.webp",
       "tag": "CITY",
       "tags": [
         "城市",
@@ -222,7 +222,7 @@
     {
       "cat": "nature",
       "date": "2024-09",
-      "src": "assets/cat-nature.jpg",
+      "src": "assets/cat-nature.webp",
       "tag": "NATURE",
       "tags": [
         "旷野",
@@ -234,7 +234,7 @@
       "cat": "city",
       "date": "2024-02",
       "note": "抬头看了很久，这栋楼在中午会拿影子在地上写字。",
-      "src": "assets/cat-city.jpg",
+      "src": "assets/cat-city.webp",
       "tag": "CITY",
       "tags": [
         "城市",
@@ -246,7 +246,7 @@
     {
       "cat": "portrait",
       "date": "2025-04",
-      "src": "assets/cat-portrait.jpg",
+      "src": "assets/cat-portrait.webp",
       "tag": "PORTRAIT",
       "tags": [
         "人像",
@@ -258,7 +258,7 @@
       "cat": "nature",
       "date": "2024-10",
       "note": "日落时云被染成金红。山那头，是另一段还没拍到的路。",
-      "src": "assets/cat-nature.jpg",
+      "src": "assets/cat-nature.webp",
       "tag": "NATURE",
       "tags": [
         "山",
@@ -270,7 +270,7 @@
     {
       "cat": "portrait",
       "date": "2025-02",
-      "src": "assets/cat-portrait.jpg",
+      "src": "assets/cat-portrait.webp",
       "tag": "PORTRAIT",
       "tags": [
         "人像",
@@ -281,7 +281,7 @@
     {
       "cat": "city",
       "date": "2023-10",
-      "src": "assets/cat-city.jpg",
+      "src": "assets/cat-city.webp",
       "tag": "CITY",
       "tags": [
         "城市",
@@ -293,7 +293,7 @@
       "cat": "nature",
       "date": "2024-06",
       "note": "光从叶缝漏下来，在地上写一些我看不懂、但觉得好看的字。",
-      "src": "assets/cat-nature.jpg",
+      "src": "assets/cat-nature.webp",
       "tag": "NATURE",
       "tags": [
         "林",
@@ -306,7 +306,7 @@
       "cat": "mono",
       "date": "2024-01",
       "note": "黑白是去掉颜色后的诚实。没有讨好，只剩结构。",
-      "src": "assets/cat-mono.jpg",
+      "src": "assets/cat-mono.webp",
       "tag": "MONO",
       "tags": [
         "黑白",
@@ -319,7 +319,7 @@
       "cat": "mono",
       "date": "2024-03",
       "note": "世界不是非黑即白，中间那堆灰，才是大多数时候的样子。",
-      "src": "assets/cat-mono.jpg",
+      "src": "assets/cat-mono.webp",
       "tag": "MONO",
       "tags": [
         "黑白",
@@ -332,7 +332,7 @@
       "cat": "nature",
       "date": "2024-12",
       "note": "零下二十度。天地间就这一棵树，倔强地站着，像在等谁。",
-      "src": "assets/cat-nature.jpg",
+      "src": "assets/cat-nature.webp",
       "tag": "NATURE",
       "tags": [
         "雪",
@@ -344,7 +344,7 @@
     {
       "cat": "city",
       "date": "2023-09",
-      "src": "assets/cat-city.jpg",
+      "src": "assets/cat-city.webp",
       "tag": "CITY",
       "tags": [
         "城市",
@@ -357,7 +357,7 @@
       "cat": "portrait",
       "date": "2025-05",
       "note": "六点五十分，她一转身，整条街的灯都成了她的边。",
-      "src": "assets/cat-portrait.jpg",
+      "src": "assets/cat-portrait.webp",
       "tag": "PORTRAIT",
       "tags": [
         "人像",
@@ -370,7 +370,7 @@
       "cat": "nature",
       "date": "2024-08",
       "note": "曝光三十分钟。原来星星一直在走，只是我们眼睛太慢，看不见。",
-      "src": "assets/cat-nature.jpg",
+      "src": "assets/cat-nature.webp",
       "tag": "NATURE",
       "tags": [
         "星",
@@ -383,7 +383,7 @@
       "cat": "city",
       "date": "2023-08",
       "note": "楼是城市的树，人是上面的叶，风一吹，各飘各的。",
-      "src": "assets/cat-city.jpg",
+      "src": "assets/cat-city.webp",
       "tag": "CITY",
       "tags": [
         "城市",
@@ -395,7 +395,7 @@
     {
       "cat": "mono",
       "date": "2024-04",
-      "src": "assets/cat-mono.jpg",
+      "src": "assets/cat-mono.webp",
       "tag": "MONO",
       "tags": [
         "黑白",
@@ -408,7 +408,7 @@
       "cat": "portrait",
       "date": "2025-06",
       "note": "他望着远处，像在想很重要的事。也可能只是发呆。但发呆也挺好。",
-      "src": "assets/cat-portrait.jpg",
+      "src": "assets/cat-portrait.webp",
       "tag": "PORTRAIT",
       "tags": [
         "人像",
@@ -420,7 +420,7 @@
     {
       "cat": "nature",
       "date": "2024-11",
-      "src": "assets/cat-nature.jpg",
+      "src": "assets/cat-nature.webp",
       "tag": "NATURE",
       "tags": [
         "沙漠",
@@ -433,7 +433,7 @@
       "cat": "city",
       "date": "2023-07",
       "note": "雨夜的霓虹淌在地上，城市软了，像个刚哭过的孩子。",
-      "src": "assets/cat-city.jpg",
+      "src": "assets/cat-city.webp",
       "tag": "CITY",
       "tags": [
         "城市",
@@ -447,7 +447,7 @@
       "cat": "video",
       "date": "2025-07",
       "note": "照片定格一瞬，视频把时间放出来走一遍。这段是某个普通傍晚，什么都没发生，又什么都发生了。",
-      "src": "assets/cat-video.jpg",
+      "src": "assets/cat-video.webp",
       "tag": "VIDEO",
       "tags": [
         "视频",
@@ -461,7 +461,7 @@
       "cat": "video",
       "date": "2025-08",
       "note": "把城市快进，它的节奏一下子清楚了。人来人往，每个人都是一个音符，走错拍也不碍事。",
-      "src": "assets/cat-video.jpg",
+      "src": "assets/cat-video.webp",
       "tag": "VIDEO",
       "tags": [
         "视频",

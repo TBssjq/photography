@@ -24,10 +24,6 @@ header[data-theme="dark"]:not(.scrolled) nav a::after,
 header[data-theme="dark"].scrolled nav a::after { background: #E8D9C8; }
 header[data-theme="dark"]:not(.scrolled) .menu-btn span,
 header[data-theme="dark"].scrolled .menu-btn span { background: #ffffff; }
-header[data-theme="dark"]:not(.scrolled) .sound-btn,
-header[data-theme="dark"].scrolled .sound-btn { color: rgba(255,255,255,.85); }
-header[data-theme="dark"]:not(.scrolled) .sound-btn:hover,
-header[data-theme="dark"].scrolled .sound-btn:hover { color: #E8D9C8; }
 header[data-theme="dark"].scrolled {
   background: rgba(26,23,20,.72);
   backdrop-filter: blur(18px) saturate(160%);
@@ -48,10 +44,6 @@ header[data-theme="light"]:not(.scrolled) nav a::after,
 header[data-theme="light"].scrolled nav a::after { background: var(--accent-ink); }
 header[data-theme="light"]:not(.scrolled) .menu-btn span,
 header[data-theme="light"].scrolled .menu-btn span { background: var(--ink); }
-header[data-theme="light"]:not(.scrolled) .sound-btn,
-header[data-theme="light"].scrolled .sound-btn { color: var(--ink-2); }
-header[data-theme="light"]:not(.scrolled) .sound-btn:hover,
-header[data-theme="light"].scrolled .sound-btn:hover { color: var(--accent-ink); }
 header[data-theme="light"].scrolled {
   background: rgba(255,255,255,.72);
   backdrop-filter: blur(18px) saturate(160%);
@@ -622,56 +614,38 @@ header[data-theme="light"].scrolled {
   display: block;
 }
 
+/* ---------- 网易云音乐播放器（固定悬浮） ---------- */
+.music-player {
+  position: fixed;
+  top: 10px;
+  right: 12px;
+  z-index: 200;
+  width: 330px;
+  height: 86px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 22px rgba(0,0,0,.18);
+  background: #f5f5f0;
+}
+.music-player iframe {
+  width: 330px;
+  height: 86px;
+  border: 0;
+  display: block;
+}
+@media (max-width: 720px) {
+  .music-player { display: none; }
+}
+
 /* ---------- Header 右侧按钮组 ---------- */
 .header-right {
   display: flex;
   align-items: center;
   gap: 6px;
+  padding-right: 350px;
 }
-
-/* ---------- 音效开关按钮 ---------- */
-.sound-btn {
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  border-radius: 50%;
-  transition: background .3s;
-  -webkit-tap-highlight-color: transparent;
-}
-.sound-btn:hover { background: rgba(255,255,255,.08); }
-.sound-btn svg {
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.sound-btn .sound-off-bar {
-  opacity: 1;
-  transition: opacity .3s;
-}
-.sound-btn.active .sound-off-bar {
-  opacity: 0;
-}
-.sound-btn .sound-on-wave {
-  opacity: 0;
-  transition: opacity .3s;
-}
-.sound-btn.active .sound-on-wave {
-  opacity: 1;
-  animation: soundWave 1.2s infinite ease-in-out;
-}
-@keyframes soundWave {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.15); opacity: 1; }
+@media (max-width: 720px) {
+  .header-right { padding-right: 0; }
 }
 
 /* ---------- Credits 弹窗 ---------- */
@@ -904,11 +878,6 @@ header[data-theme="light"].scrolled {
 @keyframes beeHintPulse {
   0%, 100% { opacity: 0.6; }
   50% { opacity: 1; }
-}
-
-/* 音效按钮激活态 */
-.sound-btn.active {
-  color: var(--accent-ink);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -653,7 +653,7 @@
      - 通过 MutationObserver 覆盖 data.js 动态注入的按钮与筛选下拉框。 */
   var ER_SELECTOR =
     'button, .btn, .abtn, .an-item, .mini-btn, .ca-btn, .flink, .lb-act, ' +
-    '.sp-opt, .gb-close, .credits-close, .footer-credits-btn, .sound-btn, ' +
+    '.sp-opt, .gb-close, .credits-close, .footer-credits-btn, ' +
     '.menu-btn, .back-top, .filter-select, .field select, .chip';
 
   function attachEaseReverseUI(el) {

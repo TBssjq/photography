@@ -23,6 +23,11 @@
 </head>
 <body>
 
+<!-- ============ Music Player ============ -->
+<div class="music-player" id="musicPlayer">
+  <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=1888933954&auto=1&height=66"></iframe>
+</div>
+
 <!-- ============ Preloader ============ -->
 <div class="preloader" id="preloader">
   <div class="preloader-inner">
@@ -53,14 +58,6 @@
     <a href="#contact">联系</a>
   </nav>
   <div class="header-right">
-    <button class="sound-btn" id="soundBtn" aria-label="toggle sound" data-magnetic>
-      <svg viewBox="0 0 24 24">
-        <path d="M3 9v6h4l5 4V5L7 9H3z"/>
-        <line class="sound-off-bar" x1="2" y1="3" x2="22" y2="21" stroke-width="2"/>
-        <path class="sound-on-wave" d="M16 8a5 5 0 0 1 0 8" opacity="0"/>
-        <path class="sound-on-wave" d="M18.5 5.5a9 9 0 0 1 0 13" opacity="0"/>
-      </svg>
-    </button>
     <button class="menu-btn" id="menuBtn" aria-label="menu" data-magnetic><span></span><span></span></button>
   </div>
 </header>
@@ -82,7 +79,6 @@
   <div class="hero-corner tr">
     <div class="hc-label">Currently</div>
     <div>Capturing light & shadow</div>
-    <div style="margin-top:8px; color:var(--ink-3); font-size:12px;">Former: <a href="#">Photography Studio</a></div>
   </div>
   <div class="hero-corner bl">
     <div class="hc-label">Based in</div>
