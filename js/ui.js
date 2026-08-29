@@ -7,14 +7,10 @@
   'use strict';
   var isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-  /* ---------- 预加载（分阶段步骤指示器，由 load-steps.js 接管） ----------
-     若 load-steps.js 已加载，则委托它驱动 preloader（真实里程碑驱动）；
-     否则退回原本的随机进度兜底。 */
+  /* ---------- 预加载（随机进度兜底） ----------
+     原先这里还有一条「委托 load-steps.js 按真实里程碑驱动」的分支，
+     但 load-steps.js 已被 Clean-Junk 归入遗留文件删除，该分支永远不会进入，故移除。 */
   function preloader() {
-    if (window.LoadSteps && typeof window.LoadSteps.start === 'function') {
-      window.LoadSteps.start();
-      return;
-    }
     var el = document.querySelector('.preloader');
     if (!el) { document.body.classList.add('loaded'); var h = document.getElementById('hero'); if (h) h.classList.add('show'); return; }
     var fill = el.querySelector('.preloader-fill');
@@ -45,53 +41,35 @@
   function progress() {
     var bar = document.querySelector('.scroll-progress');
     if (!bar) return;
-    // 兜底：若 GSAP 未加载，用原生 scroll 驱动
-    if (typeof window.gsap === 'undefined') {
-      var upd = function () {
-        var h = document.documentElement.scrollHeight - window.innerHeight;
-        bar.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
-      };
-      window.addEventListener('scroll', upd, { passive: true });
-      upd();
-    }
+    // 兜底：GSAP 缺失时（此时 animations.js 的帧循环也没跑）才由这里驱动
+    if (typeof window.gsap !== 'undefined') return;
+    window.ScrollBus.onScroll(function (y) {
+      var h = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = (h > 0 ? (y / h) * 100 : 0) + '%';
+    });
   }
 
   /* ---------- 导航 + 返回顶部 ---------- */
   function nav() {
     var header = document.querySelector('header');
     var backTop = document.querySelector('.back-top');
-    function onScroll() {
-      var y = window.scrollY;
+    /* 走统一滚动总线：原先这里自己挂 scroll 监听，而 lenisSmooth() 里又用
+       e.scroll 写了同一组 class，两个数据源在阈值附近互相覆盖产生抖动。
+       现在全站只有一个滚动来源，Lenis 与否都由 ScrollBus 统一喂值。 */
+    window.ScrollBus.onScroll(function (y) {
       if (header) header.classList.toggle('scrolled', y > 60);
       if (backTop) backTop.classList.toggle('show', y > 600);
-    }
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+    });
     if (backTop) backTop.addEventListener('click', function () {
       if (lenis) lenis.scrollTo(0);
       else window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
 
-  /* ---------- 进入视口加 class（统一由 ScrollTrigger 驱动） ----------
-     替代原先散布的 IntersectionObserver，与 animations.js 的滚动调度共用
-     同一套 ScrollTrigger，减少重复观察器与 scroll 监听。
-     onEnterClass(sel, cls, threshold) */
+  /* ---------- 进入视口加 class ----------
+     实现已抽到 js/reveal.js，与 data.js 共用同一份（原先两处几乎重复）。 */
   function revealClass(sel, cls, threshold) {
-    if (typeof window.ScrollTrigger === 'undefined') {
-      // 兜底：插件未加载时退回原生 IO
-      var els = document.querySelectorAll(sel);
-      if (!els.length) return;
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add(cls); io.unobserve(en.target); } });
-      }, { threshold: threshold || 0.4 });
-      els.forEach(function (el) { io.observe(el); });
-      return;
-    }
-    window.ScrollTrigger.batch(sel, {
-      start: 'top ' + (100 - Math.min(100, (threshold || 0.4) * 100)) + '%',
-      onEnter: function (batch) { batch.forEach(function (el) { el.classList.add(cls); }); }
-    });
+    window.Reveal.class(sel, cls, threshold);
   }
 
   /* ---------- 描边渐显（标题滚动到时由描边变实色） ---------- */
@@ -108,22 +86,19 @@
   function parallax() {
     var items = Array.prototype.slice.call(document.querySelectorAll('[data-parallax]'));
     if (!items.length) return;
-    var ticking = false;
-    function upd() {
+    // 速度系数只解析一次，别放进每帧的循环里
+    var specs = items.map(function (el) {
+      return { el: el, speed: parseFloat(el.getAttribute('data-parallax')) || 0.08 };
+    });
+    window.ScrollBus.onScroll(function () {
       var vh = window.innerHeight;
-      items.forEach(function (el) {
-        var r = el.getBoundingClientRect();
-        if (r.bottom < -200 || r.top > vh + 200) return;
+      specs.forEach(function (s) {
+        var r = s.el.getBoundingClientRect();
+        if (r.bottom < -200 || r.top > vh + 200) return; // 视口外跳过
         var progress = (r.top + r.height / 2 - vh / 2) / vh; // -0.5 ~ 0.5
-        var speed = parseFloat(el.getAttribute('data-parallax')) || 0.08;
-        el.style.transform = 'translateY(' + (-progress * speed * 100).toFixed(1) + 'px)';
+        s.el.style.transform = 'translateY(' + (-progress * s.speed * 100).toFixed(1) + 'px)';
       });
-      ticking = false;
-    }
-    window.addEventListener('scroll', function () {
-      if (!ticking) { ticking = true; requestAnimationFrame(upd); }
-    }, { passive: true });
-    upd();
+    });
   }
 
   /* ---------- 首屏鼠标视差（仅 hero 背景随光标微动，不影响标题入场动画） ---------- */
@@ -159,10 +134,17 @@
      使用 CSS translate 属性（独立于 transform），避免与
      lb-nav 的 translateY(-50%) 定位、lb-close 的 rotate(90deg) 悬停冲突。
   ---------- */
+  /* e.target 不一定是 Element（事件被直接派发到 document、或命中 svg 内部节点时
+     可能没有 closest），统一走这个守卫，避免 "e.target.closest is not a function"。
+     原先只有 mouseout 分支加了守卫，mousemove 分支漏了。 */
+  function closestFrom(e, sel) {
+    return (e.target && e.target.closest) ? e.target.closest(sel) : null;
+  }
+
   function magnetic() {
     if (isMobile) return;
     document.addEventListener('mousemove', function (e) {
-      var el = e.target.closest('[data-magnetic]');
+      var el = closestFrom(e, '[data-magnetic]');
       if (!el) return;
       var r = el.getBoundingClientRect();
       var x = (e.clientX - r.left - r.width / 2) * 0.25;
@@ -170,7 +152,7 @@
       el.style.translate = x.toFixed(1) + 'px ' + y.toFixed(1) + 'px';
     });
     document.addEventListener('mouseout', function (e) {
-      var el = e.target.closest && e.target.closest('[data-magnetic]');
+      var el = closestFrom(e, '[data-magnetic]');
       if (!el) return;
       /* 仅当鼠标真正离开 magnetic 元素时才重置（避免进入子元素时误触发） */
       var related = e.relatedTarget;
@@ -184,7 +166,7 @@
     if (isMobile) return;
     var MAX = 7;
     document.addEventListener('mousemove', function (e) {
-      var t = e.target.closest('[data-tilt]');
+      var t = closestFrom(e, '[data-tilt]');
       if (!t) return;
       var r = t.getBoundingClientRect();
       var dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
@@ -192,7 +174,7 @@
       t.style.transform = 'perspective(1000px) rotateY(' + (dx * MAX) + 'deg) rotateX(' + (-dy * MAX) + 'deg)';
     });
     document.addEventListener('mouseout', function (e) {
-      var t = e.target.closest('[data-tilt]');
+      var t = closestFrom(e, '[data-tilt]');
       if (t) t.style.transform = '';
     });
   }
@@ -253,18 +235,10 @@
     function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
 
-    /* 与滚动进度条联动（scaleX，避免 width 重排） */
-    lenis.on('scroll', function (e) {
-      var bar = document.querySelector('.scroll-progress');
-      if (bar) {
-        var h = document.documentElement.scrollHeight - window.innerHeight;
-        bar.style.transform = 'scaleX(' + (h > 0 ? (e.scroll / h) : 0).toFixed(4) + ')';
-      }
-      var header = document.querySelector('header');
-      var backTop = document.querySelector('.back-top');
-      if (header) header.classList.toggle('scrolled', e.scroll > 60);
-      if (backTop) backTop.classList.toggle('show', e.scroll > 600);
-    });
+    /* 这里不再重复处理 header / 返回顶部的状态，也不再写进度条：
+       两者都已收敛到 ScrollBus 的订阅者（nav()）与 animations.js 的帧循环。
+       原先 lenis 回调用 e.scroll、别处用 window.scrollY 写同一份状态，
+       两个数据源在平滑滚动中并不同步，会交替覆盖造成抖动。 */
 
     /* 锚点平滑滚动走 Lenis */
     document.querySelectorAll('a[href^="#"]').forEach(function (a) {
@@ -490,16 +464,12 @@
     var ind = document.getElementById('scrollIndEnhanced');
     if (!ind) return;
     var faded = false;
-    function check() {
-      var y = window.scrollY;
+    window.ScrollBus.onScroll(function (y) {
       var should = y > 100;
-      if (should !== faded) {
-        faded = should;
-        ind.classList.toggle('faded', faded);
-      }
-    }
-    window.addEventListener('scroll', check, { passive: true });
-    check();
+      if (should === faded) return; // 状态没变就不碰 DOM
+      faded = should;
+      ind.classList.toggle('faded', faded);
+    });
   }
 
   function init() {

@@ -14,7 +14,6 @@
 
   var svgContainer = null;
   var filterCache = new Map();
-  var elementFilterMap = new WeakMap();
   var filterIdCounter = 0;
 
   // 可调参数（与视觉强度相关）
@@ -115,7 +114,13 @@
     return { url: canvas.toDataURL(), scale: maxScale * 2 };
   }
 
-  function getOrCreateFilter(width, height, radius, strength, distortion) {
+  function getOrCreateFilter(rawWidth, rawHeight, radius, strength, distortion) {
+    /* 尺寸向上取整到 8px 的倍数：
+       - 生成贴图是 O(w×h) 的重活，加上 canvas.toDataURL()，拖动窗口时 1px 抖动
+         就重算一次会造成明显卡顿；
+       - 向上取整保证滤镜区域永远 ≥ 元素实际尺寸，不会被裁掉边缘。 */
+    var width = Math.max(8, Math.ceil(rawWidth / 8) * 8);
+    var height = Math.max(8, Math.ceil(rawHeight / 8) * 8);
     var key = width + '-' + height + '-' + radius + '-' + strength.toFixed(3) + '-' + distortion.toFixed(3);
     if (filterCache.has(key)) return filterCache.get(key);
 
@@ -162,17 +167,6 @@
     return id;
   }
 
-  function applyLiquidGlassEffect(el) {
-    var rect = el.getBoundingClientRect();
-    var width = Math.round(rect.width);
-    var height = Math.round(rect.height);
-    if (width < 8 || height < 8) return;
-    var style = getComputedStyle(el);
-    var radius = parseFloat(style.borderTopLeftRadius) || 16;
-    var filterId = getOrCreateFilter(width, height, radius, currentRefractionStrength, currentDistortion);
-    el.style.setProperty('--lg-filter', 'url(#' + filterId + ')');
-  }
-
   function updateElementFilter(el) {
     var rect = el.getBoundingClientRect();
     var width = Math.round(rect.width);
@@ -182,13 +176,29 @@
     var radius = parseFloat(style.borderTopLeftRadius) || 16;
     var filterId = getOrCreateFilter(width, height, radius, currentRefractionStrength, currentDistortion);
     el.style.setProperty('--lg-filter', 'url(#' + filterId + ')');
-    elementFilterMap.set(el, filterId);
   }
 
   function refreshAllFilters() {
     document.querySelectorAll('.lg').forEach(function (el) {
       updateElementFilter(el);
     });
+  }
+
+  /* mousemove 是高频事件，每次都 getBoundingClientRect() 会强制同步布局。
+     同一时刻只可能有一个元素被悬停，故缓存单个 rect，滚动/缩放时失效即可。 */
+  var cachedEl = null, cachedRect = null;
+  function invalidateRect() { cachedEl = null; cachedRect = null; }
+  /* 挂在统一滚动总线上：总线同时订阅了 scroll 与 resize，
+     这里就不必再各挂一个监听。onScroll 注册时会立即跑一次。 */
+  if (window.ScrollBus) window.ScrollBus.onScroll(invalidateRect);
+  else {
+    window.addEventListener('scroll', invalidateRect, { passive: true });
+    window.addEventListener('resize', invalidateRect);
+  }
+
+  function rectOf(el) {
+    if (el !== cachedEl) { cachedEl = el; cachedRect = el.getBoundingClientRect(); }
+    return cachedRect;
   }
 
   // 给玻璃元素加鼠标光晕（仅在有 .lg-mouse 子节点时生效）
@@ -201,7 +211,7 @@
         el.appendChild(light);
       }
       el.addEventListener('mousemove', function (e) {
-        var rect = el.getBoundingClientRect();
+        var rect = rectOf(el);
         light.style.setProperty('--mx', (e.clientX - rect.left) + 'px');
         light.style.setProperty('--my', (e.clientY - rect.top) + 'px');
       });

@@ -139,11 +139,11 @@
     if (_resumeTimer) clearTimeout(_resumeTimer);
     _resumeTimer = setTimeout(function () { paused = false; }, 200);
   }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('wheel', onScroll, { passive: true });
-  window.addEventListener('touchmove', onScroll, { passive: true });
-  if (window.lenis) window.lenis.on('scroll', onScroll);
-  else window.addEventListener('lenis:ready', function () { if (window.lenis) window.lenis.on('scroll', onScroll); });
+  /* 挂在统一滚动总线上。原先这里挂了 scroll / wheel / touchmove 三个 window 监听，
+     外加 lenis.on('scroll') 与 lenis:ready 兜底，其实前三者最终都会派发 scroll，
+     而 Lenis 驱动的是原生滚动、总线照样收得到。 */
+  if (window.ScrollBus) window.ScrollBus.onScroll(onScroll);
+  else window.addEventListener('scroll', onScroll, { passive: true });
 
   // 页面隐藏时暂停，省电；恢复时继续
   document.addEventListener('visibilitychange', function () {

@@ -81,8 +81,10 @@ button { font-family: inherit; background: none; border: none; }
 .scroll-progress { position: fixed; top: 0; left: 0; width: 0; height: 2px; background: var(--accent); z-index: 9998; transition: width .12s linear; }
 
 /* ---------- 自定义光标 ---------- */
-.cursor-dot { position: fixed; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 10001; transform: translate(-50%,-50%); transition: width .2s, height .2s, opacity .2s; }
-.cursor-ring { position: fixed; width: 34px; height: 34px; border: 1.5px solid var(--accent); border-radius: 50%; pointer-events: none; z-index: 10001; transform: translate(-50%,-50%); opacity: .55; transition: width .25s var(--ease-out), height .25s var(--ease-out), opacity .25s, background .25s, border-color .25s; }
+/* 定位交给 JS 写的 `translate` 属性（cursor.js），这里把 left/top 钉死为 0，
+   避免 position:fixed + auto 偏移时落在静态位置上导致基准不一致。 */
+.cursor-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 10001; transform: translate(-50%,-50%); will-change: translate; transition: width .2s, height .2s, opacity .2s; }
+.cursor-ring { position: fixed; top: 0; left: 0; width: 34px; height: 34px; border: 1.5px solid var(--accent); border-radius: 50%; pointer-events: none; z-index: 10001; transform: translate(-50%,-50%); opacity: .55; will-change: translate; transition: width .25s var(--ease-out), height .25s var(--ease-out), opacity .25s, background .25s, border-color .25s; }
 .cursor-ring.hover { width: 60px; height: 60px; opacity: 1; background: var(--accent-glow); border-color: var(--accent-ink); }
 .cursor-ring.view { width: 84px; height: 84px; opacity: 1; background: var(--accent-glow); border-color: var(--accent-ink); }
 .cursor-ring.view::after { content: 'VIEW'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 10px; letter-spacing: .15em; color: var(--accent); }

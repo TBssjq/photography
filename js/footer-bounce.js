@@ -8,7 +8,12 @@
 (function () {
   'use strict';
 
+  /* 波浪的两个形变状态：down（下垂）与 center（拉平） */
+  var DOWN = 'M0-0.3C0-0.3,464,156,1139,156S2278-0.3,2278-0.3V683H0V-0.3z';
+  var CENTER = 'M0-0.3C0-0.3,464,0,1139,0s1139-0.3,1139-0.3V683H0V-0.3z';
+
   function init() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (typeof window.gsap === 'undefined' ||
         typeof window.ScrollTrigger === 'undefined' ||
         typeof window.MorphSVGPlugin === 'undefined') {
@@ -20,24 +25,25 @@
     var path = document.querySelector('#bouncy-path');
     if (!path) return;
 
-    var down = 'M0-0.3C0-0.3,464,156,1139,156S2278-0.3,2278-0.3V683H0V-0.3z';
-    var center = 'M0-0.3C0-0.3,464,0,1139,0s1139-0.3,1139-0.3V683H0V-0.3z';
+    /* elastic.out(amplitude, period) 要求 period > 0：把滚动速度换算出的形变量夹在
+       安全区间，避免快速滚动时算出负值导致缓动失效（原先未夹取，快滚时参数非法）。 */
+    var clampVariation = gsap.utils.clamp(-0.6, 0.6);
 
     ScrollTrigger.create({
       trigger: '.footer-wave',
       start: 'top bottom',
-      toggleActions: 'play pause resume reverse',
       onEnter: function (self) {
-        var velocity = self.getVelocity();
-        var variation = velocity / 10000;
+        var variation = clampVariation(self.getVelocity() / 10000);
 
-        gsap.fromTo('#bouncy-path', {
-          morphSVG: down
+        gsap.fromTo(path, {
+          morphSVG: DOWN
         }, {
           duration: 2,
-          morphSVG: center,
+          morphSVG: CENTER,
           ease: 'elastic.out(' + (1 + variation) + ', ' + (1 - variation) + ')',
-          overwrite: 'true'
+          /* 必须是布尔 true：字符串 'true' 不参与 GSAP 的严格比较，overwrite 会静默失效，
+             导致快速反复进入时多个 morph tween 互相叠加。 */
+          overwrite: true
         });
       }
     });

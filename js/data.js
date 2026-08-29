@@ -6,31 +6,10 @@
 (function () {
   'use strict';
 
-  /* 进入视口加 class（统一由 ScrollTrigger 驱动，与 animations.js 共用调度层）。
-     插件缺失时退回原生 IO，保证降级可用。 */
+  /* 进入视口加 class：实现已抽到 js/reveal.js，与 ui.js 共用同一份
+     （原先两处几乎重复，只有入参宽容度和默认阈值不同）。 */
   function revealClass(sel, cls, threshold) {
-    var els;
-    if (typeof sel === 'string') {
-      els = document.querySelectorAll(sel);
-    } else if (sel && sel.nodeType) {
-      els = [sel]; // 单个 DOM 元素
-    } else if (sel && sel.length !== undefined) {
-      els = sel; // NodeList / 数组
-    } else {
-      return;
-    }
-    if (!els.length) return;
-    if (typeof window.ScrollTrigger === 'undefined') {
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add(cls); io.unobserve(en.target); } });
-      }, { threshold: threshold || 0.2 });
-      els.forEach(function (el) { io.observe(el); });
-      return;
-    }
-    window.ScrollTrigger.batch(els, {
-      start: 'top ' + (100 - Math.min(100, (threshold || 0.2) * 100)) + '%',
-      onEnter: function (batch) { batch.forEach(function (el) { el.classList.add(cls); }); }
-    });
+    window.Reveal.class(sel, cls, threshold);
   }
 
   var SITE = {};
@@ -549,6 +528,9 @@
     var ROT_TABLE = [-4, 3, -2, 5, -5, 2, -3, 4, -1.5];
     card.style.setProperty('--rot', ROT_TABLE[idx % ROT_TABLE.length] + 'deg');
     card.dataset.index = galleryItems.length;
+    /* Flip 重排（gallery-motion.js）靠 data-flip-id 把「筛选前的旧卡片」与
+       「重建后的新卡片」配对，因此这个 id 必须在同一作品的多次渲染之间保持稳定。 */
+    card.dataset.flipId = 'gp-' + (p.src || p.img || (p.title || '') + '#' + idx);
 
     var hasVideoSrc = isVideo(p.src);
     var isVid = hasVideoSrc || p.type === 'video';
@@ -632,14 +614,20 @@
     return card;
   }
 
-  function renderNextBatch() {
+  /* flipping=true 表示这批卡片是筛选/排序重排产生的，
+     出场动画交给 Flip，这里只登记，避免与 Flip 的 onEnter 叠加成双重淡入。 */
+  function renderNextBatch(flipping) {
     if (!batchState.grid) return;
     var list = batchState.photos;
     var end = Math.min(batchState.rendered + BATCH, list.length);
+    var added = [];
     for (var i = batchState.rendered; i < end; i++) {
-      batchState.grid.appendChild(buildCard(list[i], i));
+      var card = buildCard(list[i], i);
+      batchState.grid.appendChild(card);
+      added.push(card);
     }
     batchState.rendered = end;
+    if (window.GalleryMotion) window.GalleryMotion.ingest(added, !!flipping);
     if (batchState.rendered >= list.length && batchState.io) {
       batchState.io.disconnect();
       if (batchState.sentinel && batchState.sentinel.parentNode) {
@@ -652,6 +640,9 @@
   function renderGallery() {
     var grid = document.getElementById('galleryGrid');
     if (!grid) return;
+    /* 重建前先快照旧布局，渲染完成后由 gallery-motion.js 用 Flip 平滑迁移。
+       首次渲染时 grid 里还没有卡片，快照为 null，走普通的入场揭幕。 */
+    var flipState = window.GalleryMotion ? window.GalleryMotion.beforeRender(grid) : null;
     // 清理上一次的滚动监听与哨兵
     if (batchState.io) { batchState.io.disconnect(); batchState.io = null; }
     if (batchState.sentinel && batchState.sentinel.parentNode) {
@@ -666,6 +657,7 @@
     if (!photos.length) {
       if (empty) empty.style.display = 'block';
       updateGalleryCount(0);
+      if (window.GalleryMotion) window.GalleryMotion.afterRender(flipState);
       return;
     }
     if (empty) empty.style.display = 'none';
@@ -673,7 +665,7 @@
     batchState.photos = photos;
     batchState.rendered = 0;
     batchState.grid = grid;
-    renderNextBatch();
+    renderNextBatch(!!flipState);
     updateGalleryCount(photos.length);
 
     // 迁移自 Hero Showcase：悬停某张卡片时给网格加 has-hover，
@@ -705,6 +697,8 @@
       }, { rootMargin: '600px 0px' });
       batchState.io.observe(sentinel);
     }
+
+    if (window.GalleryMotion) window.GalleryMotion.afterRender(flipState);
   }
 
   // 渲染友情链接（每行 "标题|网址"）
@@ -743,9 +737,15 @@
     });
   }
 
+  /* 计数动画的 rAF 句柄：连续切换筛选条件时会并发跑多个循环写同一个元素，
+     互相覆盖导致数字乱跳，故每次开新循环前先取消上一个。 */
+  var countRafId = null;
+
   function updateGalleryCount(n) {
     var el = document.getElementById('galleryCount');
     if (!el) return;
+    if (countRafId) { cancelAnimationFrame(countRafId); countRafId = null; }
+
     var start = parseInt(el.textContent, 10) || 0;
     if (start === n) { el.textContent = n; return; }
     var t0 = performance.now(), dur = 700;
@@ -753,9 +753,9 @@
       var p = Math.min(1, (now - t0) / dur);
       var eased = 1 - Math.pow(1 - p, 3);
       el.textContent = Math.round(start + (n - start) * eased);
-      if (p < 1) requestAnimationFrame(step);
+      countRafId = (p < 1) ? requestAnimationFrame(step) : null;
     }
-    requestAnimationFrame(step);
+    countRafId = requestAnimationFrame(step);
   }
 
   /* ---------- 多维筛选器（栏目 / 年份 / 标签 / 排序） ---------- */

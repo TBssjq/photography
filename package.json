@@ -4,7 +4,8 @@
   "description": "隋北 摄影作品集网站 — 纯静态，含可视化内容后台，双击 index.html 即可运行",
   "private": true,
   "scripts": {
-    "start": "echo \"纯静态站点：直接双击 index.html 即可在浏览器打开。如需内容后台，打开 admin.html。\""
+    "start": "echo \"纯静态站点：直接双击 index.html 即可在浏览器打开。如需内容后台，打开 admin.html。\"",
+    "smoke": "node scripts/smoke.mjs"
   },
   "dependencies": {
     "gsap": "^3.15.0"

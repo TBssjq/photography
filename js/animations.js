@@ -101,6 +101,34 @@
     });
   }
 
+  /* 让无限循环 tween 只在元素处于视口内时运行（离屏暂停，避免长列表里持续空耗主线程）。
+     ScrollTrigger 缺失时保持常驻运行，保证降级仍有动效。 */
+  function playInView(tween, trigger) {
+    if (!hasST) return tween;
+    tween.pause();
+    window.ScrollTrigger.create({
+      trigger: trigger, start: 'top bottom', end: 'bottom top',
+      onToggle: function (self) { self.isActive ? tween.play() : tween.pause(); }
+    });
+    return tween;
+  }
+
+  /* 事件委托版 hover：只挂 2 个 document 级监听，而不是给 N 个元素各挂一对
+     mouseenter/mouseleave（画廊有上百张卡片时可省下数百个监听器）。
+     在同一元素内部子元素之间移动不会误判为「离开」。 */
+  function delegateHover(selector, onEnter, onLeave) {
+    document.addEventListener('mouseover', function (e) {
+      var t = e.target.closest && e.target.closest(selector);
+      if (!t || (e.relatedTarget && t.contains(e.relatedTarget))) return;
+      onEnter(t);
+    });
+    document.addEventListener('mouseout', function (e) {
+      var t = e.target.closest && e.target.closest(selector);
+      if (!t || (e.relatedTarget && t.contains(e.relatedTarget))) return;
+      onLeave(t);
+    });
+  }
+
   /* 等 DOM 与 data.js 动态注入完成后初始化 */
   function init() {
     if (prefersReduced) {
@@ -143,13 +171,29 @@
   }
 
   /* ---------- 中央滚动调度（性能核心） ----------
-     将「滚动进度 / 画廊视差」统一到 GSAP ticker 单帧循环，
-     避免每帧新建 tween、避免多个独立 scroll 监听器各自读 layout。
-     - 滚动进度条直接写 style.width（已交由 Lenis / ui.js 写入，此处做兜底同步）。
-     - 画廊视差改用 CSS 变量 --fy（与 data.js.setupParallax 一致，零重排）。 */
+     把「滚动进度条 / 画廊视差」收进同一个 rAF 帧循环，避免多个独立监听各自读 layout。
+     约定：
+     - 只在滚动时调度，停止滚动即空转归零；
+     - 文档高度缓存，尺寸变化时才重算（每帧读 scrollHeight 会强制同步 layout）；
+     - 进度条写 transform:scaleX，视差写 CSS 变量 --fy（与 data.js 一致，零重排）。 */
   var _scrollBar = null;
-  var _parallaxImgs = null;
-  var _tickerFn = null;
+  var _parallaxItems = null;  // [{img, wrap}] —— 预解析容器，逐帧循环里不再调 closest()
+  var _docHeight = 0;         // 缓存「可滚动高度」，避免每帧读 scrollHeight 触发强制 layout
+
+  /* 收集视差图片，并把容器节点一次性解析好 */
+  function collectParallax() {
+    var imgs = document.querySelectorAll('.featured-img-wrap img, .fr-media img');
+    var out = [];
+    for (var i = 0; i < imgs.length; i++) {
+      var wrap = imgs[i].closest('.featured-img-wrap, .fr-media, .about-img');
+      if (wrap) out.push({ img: imgs[i], wrap: wrap });
+    }
+    return out;
+  }
+
+  function measureDoc() {
+    _docHeight = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  }
 
   function setupScrollProgress() {
     _scrollBar = document.querySelector('.scroll-progress');
@@ -162,44 +206,40 @@
         'transform:scaleX(0);transform-origin:left center;will-change:transform;';
       document.body.appendChild(_scrollBar);
     }
-    // 仅做兜底：若 Lenis/ui.js 已驱动进度条则下方 ticker 也会同步，互不冲突。
-    if (!_parallaxImgs) _parallaxImgs = document.querySelectorAll('.featured-img-wrap img, .fr-media img');
-    if (_tickerFn) return;
-    _tickerFn = function () {
+    if (!_parallaxItems) _parallaxItems = collectParallax();
+
+    var frame = function () {
       if (_scrollBar) {
-        var h = document.documentElement.scrollHeight - window.innerHeight;
-        var p = h > 0 ? (window.scrollY / h) : 0;
+        var p = _docHeight > 0 ? (window.scrollY / _docHeight) : 0;
         // 写 transform:scaleX 而非 width，避免每帧触发 layout 重排（滚动卡顿主因之一）
         _scrollBar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
       }
-      if (!prefersReduced) {
-        // 画廊图片由 data.js 动态批量注入，此处懒重查以避免遗漏新节点
-        if (!_parallaxImgs || !_parallaxImgs.length) {
-          _parallaxImgs = document.querySelectorAll('.featured-img-wrap img, .fr-media img');
-        }
-        if (_parallaxImgs && _parallaxImgs.length) {
-        var vh = window.innerHeight;
-        for (var i = 0; i < _parallaxImgs.length; i++) {
-          var img = _parallaxImgs[i];
-          var wrap = img.closest('.featured-img-wrap, .fr-media, .about-img');
-          if (!wrap) continue;
-          var rect = wrap.getBoundingClientRect();
-          if (rect.bottom < -200 || rect.top > vh + 200) continue; // 视口外跳过，避免无谓布局查询
-          var offset = (rect.top + rect.height / 2 - vh / 2);
-          // 写 CSS 变量，由 CSS transform: translateY(var(--fy)) 消费（零重排）
-          img.style.setProperty('--fy', (-offset * 0.04).toFixed(1) + 'px');
-        }
-        }
+      if (prefersReduced || !_parallaxItems.length) return;
+      var vh = window.innerHeight;
+      for (var i = 0; i < _parallaxItems.length; i++) {
+        var item = _parallaxItems[i];
+        var rect = item.wrap.getBoundingClientRect();
+        if (rect.bottom < -200 || rect.top > vh + 200) continue; // 视口外跳过，避免无谓布局查询
+        var offset = (rect.top + rect.height / 2 - vh / 2);
+        // 写 CSS 变量，由 CSS transform: translateY(var(--fy)) 消费（零重排）
+        item.img.style.setProperty('--fy', (-offset * 0.04).toFixed(1) + 'px');
       }
     };
-    // 仅由滚动事件驱动（Lenis 或原生 scroll），停止滚动时不空转，避免长列表滚动卡顿
-    var _rafQueued = false;
-    function flushFrame() { _rafQueued = false; _tickerFn(); }
-    if (window.lenis) {
-      window.lenis.on('scroll', function () { if (!_rafQueued) { _rafQueued = true; requestAnimationFrame(flushFrame); } });
+
+    /* 文档高度只在真正变化时重算：原先每帧读 scrollHeight 会强制同步 layout，
+       是长列表滚动时的主要开销之一。 */
+    measureDoc();
+    window.addEventListener('resize', measureDoc);
+    if (hasST) window.ScrollTrigger.addEventListener('refresh', measureDoc);
+    if (window.ResizeObserver) {
+      // 图片加载 / 画廊分批注入都会让文档变高，交给 ResizeObserver 兜底重算，
+      // 否则进度条会随内容增长越走越偏。
+      new ResizeObserver(measureDoc).observe(document.body);
     }
-    window.addEventListener('scroll', function () { if (!_rafQueued) { _rafQueued = true; requestAnimationFrame(flushFrame); } }, { passive: true });
-    _tickerFn(); // 首帧初始化进度
+
+    /* 挂在统一滚动总线上：全站只保留一个 scroll 监听 + 一次 rAF 节流，
+       不再每个模块各挂一套。onScroll 注册时会立即跑一次，即原来的首帧初始化。 */
+    window.ScrollBus.onScroll(frame);
   }
 
   /* ---------- 预加载计数强化（视觉脉冲，不影响原逻辑） ---------- */
@@ -207,12 +247,24 @@
     var pre = document.querySelector('.preloader');
     var count = pre && pre.querySelector('.preloader-count');
     if (!count) return;
-    gsap.fromTo(count, { scale: 0.9 }, {
+    var tweens = [gsap.fromTo(count, { scale: 0.9 }, {
       scale: 1, duration: 0.6, ease: 'sine.inOut',
       repeat: -1, yoyo: true
-    });
+    })];
     var ring = pre.querySelector('.preloader-ring');
-    if (ring) gsap.to(ring, { rotation: 360, duration: 4, ease: 'none', repeat: -1 });
+    if (ring) tweens.push(gsap.to(ring, { rotation: 360, duration: 4, ease: 'none', repeat: -1 }));
+
+    /* preloader 会被移除，必须同时 kill 它的无限 tween：
+       否则这些 tween 会一直挂在全局时间线上空转（既泄漏又每帧白算）。 */
+    if (typeof MutationObserver === 'undefined') return;
+    var mo = new MutationObserver(function () {
+      if (!pre.isConnected || pre.classList.contains('done')) {
+        mo.disconnect();
+        tweens.forEach(function (t) { t.kill(); });
+      }
+    });
+    mo.observe(pre, { attributes: true, attributeFilter: ['class'] });
+    if (pre.parentNode) mo.observe(pre.parentNode, { childList: true });
   }
 
   /* ---------- Hero 入场时间线（匹配真实 DOM：#heroDisplay .hd-line） ---------- */
@@ -266,16 +318,21 @@
   function setupNumberCounters() {
     onEnterAll('.stat', function (nodes) {
       nodes.forEach(function (stat) {
+        // ScrollTrigger.batch 在 refresh 后可能再次 onEnter，加一次性守卫避免重复计数
+        if (stat.dataset.counted === '1') return;
+        stat.dataset.counted = '1';
         var h = stat.querySelector('h4');
         if (!h) return;
         var raw = h.textContent.trim();
         var num = parseInt(raw, 10);
         if (isNaN(num)) return;
+        // 后缀（如「台机身走天下」里的非数字部分）只算一次，别放进每帧的 onUpdate
+        var suffix = raw.replace(/[0-9]/g, '');
         var obj = { v: 0 };
         gsap.to(obj, {
           v: num, duration: 1.4, ease: 'power2.out',
           onUpdate: function () {
-            h.textContent = Math.round(obj.v) + raw.replace(/[0-9]/g, '');
+            h.textContent = Math.round(obj.v) + suffix;
           }
         });
         // 注意：.stat 的入场位移已由 data.js 的 setupReveal（CSS .show）统一负责，
@@ -299,15 +356,10 @@
       // 此处不再对 card 绑定 scale 的 gsap.to——否则 GSAP 写 transform 会与 CSS !important
       // 争抢，导致每帧 transform 被反复覆盖、卡片抖动/滑动卡顿。
     });
-    // 舞台轻微浮动（性能：离屏时暂停，避免长列表中持续空耗）
-    var stageTween = gsap.to(stage, {
-      y: 8, duration: 3, ease: 'sine.inOut', repeat: -1, yoyo: true,
-      paused: !hasST
-    });
-    if (hasST) window.ScrollTrigger.create({
-      trigger: stage, start: 'top bottom', end: 'bottom top',
-      onToggle: function (self) { self.isActive ? stageTween.play() : stageTween.pause(); }
-    });
+    // 舞台轻微浮动（离屏暂停，避免长列表中持续空耗）
+    playInView(gsap.to(stage, {
+      y: 8, duration: 3, ease: 'sine.inOut', repeat: -1, yoyo: true
+    }), stage);
   }
 
   /* ---------- 灯箱 GSAP 入场 ---------- */
@@ -345,10 +397,12 @@
       layers = hero.querySelectorAll('.hero-title, .hero-sub');
     }
     if (!layers.length) return;
-    // 性能：用 quickTo 复用同一个 tween，避免每次 mousemove 新建 gsap.to（零分配、更顺滑）
+    // 性能：用 quickTo 复用同一个 tween，避免每次 mousemove 新建 gsap.to（零分配、更顺滑）；
+    // 视差深度在建立时解析一次并缓存，避免每个 mousemove 都读属性再 parseFloat。
     var setters = [];
     layers.forEach(function (el) {
       setters.push({
+        depth: parseFloat(el.getAttribute('data-mouse-parallax')) || 10,
         x: gsap.quickTo(el, 'x', { duration: 1.4, ease: 'power3.out' }),
         y: gsap.quickTo(el, 'y', { duration: 1.4, ease: 'power3.out' })
       });
@@ -356,15 +410,14 @@
     hero.addEventListener('mousemove', function (e) {
       var cx = (e.clientX / window.innerWidth - 0.5);
       var cy = (e.clientY / window.innerHeight - 0.5);
-      layers.forEach(function (el, i) {
-        var d = parseFloat(el.getAttribute('data-mouse-parallax')) || 10;
-        setters[i].x(cx * d);
-        setters[i].y(cy * d);
-      });
+      for (var i = 0; i < setters.length; i++) {
+        setters[i].x(cx * setters[i].depth);
+        setters[i].y(cy * setters[i].depth);
+      }
     });
     // 鼠标离开 hero 时缓回原位
     hero.addEventListener('mouseleave', function () {
-      layers.forEach(function (el, i) { setters[i].x(0); setters[i].y(0); });
+      for (var i = 0; i < setters.length; i++) { setters[i].x(0); setters[i].y(0); }
     });
   }
 
@@ -372,24 +425,19 @@
      已整合进 setupScrollProgress 的中央 gsap.ticker（写 CSS 变量 --fy，零重排）。
      保留此函数仅作兼容占位，不再单独绑定 scroll 监听。 */
   function setupGalleryParallax() {
-    // 兼容：确保 parallax 图片节点在 ticker 中可用（data.js 动态注入后调用一次）。
-    if (!_parallaxImgs || !_parallaxImgs.length) {
-      _parallaxImgs = document.querySelectorAll('.featured-img-wrap img, .fr-media img, .about-img img');
+    // 兼容：确保 parallax 图片节点在帧循环里可用（data.js 动态注入后重建一次缓存）。
+    if (!_parallaxItems || !_parallaxItems.length) {
+      _parallaxItems = collectParallax();
     }
   }
 
   /* ---------- 装饰性持续浮动 ---------- */
   function setupFloatingDecor() {
-    // 章节序号缓慢上下浮动（性能：离屏时暂停，避免长列表多处持续 tween 空耗）
+    // 章节序号缓慢上下浮动（离屏时暂停，避免长列表多处持续 tween 空耗）
     gsap.utils.toArray('.sec-num').forEach(function (el, i) {
-      var tw = gsap.to(el, {
-        y: 6, duration: 2.4 + i * 0.1, ease: 'sine.inOut', repeat: -1, yoyo: true,
-        paused: !hasST
-      });
-      if (hasST) window.ScrollTrigger.create({
-        trigger: el, start: 'top bottom', end: 'bottom top',
-        onToggle: function (self) { self.isActive ? tw.play() : tw.pause(); }
-      });
+      playInView(gsap.to(el, {
+        y: 6, duration: 2.4 + i * 0.1, ease: 'sine.inOut', repeat: -1, yoyo: true
+      }), el);
     });
     // 注意：.rule 下划线绘制已由 ui.js.rules()（CSS .show 过渡 ::after 的 scaleX）统一负责，
     // 此处不再用 gsap.fromTo 缩放 .rule 本体，避免与伪元素 scaleX 双重绘制。
@@ -401,15 +449,17 @@
     btns.forEach(function (btn) {
       var sheen = document.createElement('span');
       sheen.className = 'gsap-sheen';
-      sheen.style.cssText = 'position:absolute;top:0;left:-60%;width:50%;height:100%;' +
+      // 起点 left:0 + width:50%，后续只用 xPercent 位移（-100% → 200% 正好扫过整个按钮）
+      sheen.style.cssText = 'position:absolute;top:0;left:0;width:50%;height:100%;' +
         'background:linear-gradient(120deg,transparent,rgba(255,255,255,.35),transparent);' +
-        'transform:skewX(-20deg);pointer-events:none;';
+        'transform:skewX(-20deg);pointer-events:none;will-change:transform;';
       var pos = getComputedStyle(btn).position;
       if (pos === 'static') btn.style.position = 'relative';
       btn.style.overflow = 'hidden';
       btn.appendChild(sheen);
       btn.addEventListener('mouseenter', function () {
-        gsap.fromTo(sheen, { left: '-60%' }, { left: '120%', duration: 0.7, ease: 'power2.inOut' });
+        // 用 xPercent（transform）代替 left：left 是布局属性，每帧都会触发重排
+        gsap.fromTo(sheen, { xPercent: -100 }, { xPercent: 200, duration: 0.7, ease: 'power2.inOut' });
       });
     });
   }
@@ -425,7 +475,8 @@
   function setupFooterStagger() {
     onEnterAll('.links', function (nodes) {
       nodes.forEach(function (l) {
-        gsap.from(l.children, { y: 14, opacity: 0, duration: 0.5, stagger: 0.06, ease: 'power2.out' });
+        // l.children 是 live HTMLCollection，GSAP 不收（会报 "GSAP target [object HTMLCollection] not found"）；先转数组
+        gsap.from(gsap.utils.toArray(l.children), { y: 14, opacity: 0, duration: 0.5, stagger: 0.06, ease: 'power2.out' });
       });
     }, { threshold: 0.3 });
   }
@@ -478,7 +529,8 @@
       els.forEach(function (el) {
         // 已被 split-reveal.js 处理过的 .split 元素不再重复拆分，避免双重动画冲突/抖动
         if (el.classList.contains('split')) return;
-        var split = new window.SplitText(el, { type: cfg.type, wordsClass: 'rt-word', charsClass: 'rt-char' });
+        // 与 split-reveal.js 统一用 SplitText.create（v3.13 起的推荐工厂写法）
+        var split = window.SplitText.create(el, { type: cfg.type, wordsClass: 'rt-word', charsClass: 'rt-char' });
         var units = cfg.type === 'words' ? split.words : split.chars;
         gsap.set(units, { yPercent: 110, opacity: 0 });
 
@@ -497,8 +549,8 @@
   function setupMarquee() {
     var track = document.querySelector('.marquee-track');
     if (!track) return;
-    // 轨道内含两份相同内容，平移 -50% 即可无缝循环
-    gsap.to(track, { xPercent: -50, duration: 22, ease: 'none', repeat: -1 });
+    // 轨道内含两份相同内容，平移 -50% 即可无缝循环（离屏时暂停）
+    playInView(gsap.to(track, { xPercent: -50, duration: 22, ease: 'none', repeat: -1 }), track);
   }
 
   /* ---------- 献词区：细线展开由 ui.js.rules() 统一（CSS .show），此处仅占位兼容 ---------- */
@@ -525,42 +577,50 @@
         once: true
       }
     });
-    // 持续轻微浮动呼吸（叠加在 CSS 显示之上）
-    gsap.to(spans, { y: -6, duration: 3, ease: 'sine.inOut', repeat: -1, yoyo: true, stagger: { each: 0.2, from: 'center' } });
-    // 副标题淡入
+    // 持续轻微浮动呼吸（叠加在 CSS 显示之上；离屏暂停，避免整站离屏时仍在跑无限 tween）
+    playInView(gsap.to(spans, {
+      y: -6, duration: 3, ease: 'sine.inOut', repeat: -1, yoyo: true,
+      stagger: { each: 0.2, from: 'center' }
+    }), dw);
+    /* 副标题：入场交给 text-scramble.js 做 ScrambleText 解扰；
+       插件缺失时退化成原来的淡入，保证「没有解扰也还有入场」，两者不会叠加。 */
     var sub = dw.parentElement && dw.parentElement.querySelector('.display-sub');
-    if (sub) onEnter(sub, function () { gsap.from(sub, { opacity: 0, y: 14, duration: 0.8, ease: 'power2.out' }); }, { threshold: 0.4 });
+    if (sub && typeof window.ScrambleTextPlugin === 'undefined') {
+      onEnter(sub, function () { gsap.from(sub, { opacity: 0, y: 14, duration: 0.8, ease: 'power2.out' }); }, { threshold: 0.4 });
+    }
   }
 
   /* ---------- 卡片悬停增强：图片放大 + 标题上滑 + 信息层滑入 ---------- */
   function setupCardHover() {
-    // featured 交错行图片：悬停时图片缓慢 zoom（委托到 #featuredList，兼容动态注入）
-    var fl = document.getElementById('featuredList');
-    if (fl) fl.addEventListener('mouseover', function (e) {
-      var wrap = e.target.closest('.fr-media');
-      if (!wrap || wrap._hoverBound) return;
-      wrap._hoverBound = true;
+    var CARD_MEDIA = '.media-wrap img, .media-wrap video';
+
+    // featured 交错行图片：悬停时图片缓慢 zoom（委托，天然兼容动态注入）
+    delegateHover('.fr-media', function (wrap) {
       var img = wrap.querySelector('img');
-      if (img) {
-        wrap.addEventListener('mouseenter', function () { gsap.to(img, { scale: 1.06, duration: 0.9, ease: 'power2.out' }); });
-        wrap.addEventListener('mouseleave', function () { gsap.to(img, { scale: 1, duration: 1.0, ease: 'power2.out' }); });
-      }
+      if (img) gsap.to(img, { scale: 1.06, duration: 0.9, ease: 'power2.out', overwrite: 'auto' });
+    }, function (wrap) {
+      var img = wrap.querySelector('img');
+      if (img) gsap.to(img, { scale: 1, duration: 1.0, ease: 'power2.out', overwrite: 'auto' });
     });
+
     // gallery 卡片：悬停时内部图片轻微 zoom + 标题上滑（不碰 bee3d 的整体 3D）
-    document.querySelectorAll('.card').forEach(function (card) {
-      var img = card.querySelector('.media-wrap img, .media-wrap video');
+    delegateHover('.card', function (card) {
+      var img = card.querySelector(CARD_MEDIA);
       var h3 = card.querySelector('.overlay h3');
-      if (img) card.addEventListener('mouseenter', function () { gsap.to(img, { scale: 1.08, duration: 0.7, ease: 'power2.out' }); });
-      if (img) card.addEventListener('mouseleave', function () { gsap.to(img, { scale: 1, duration: 0.8, ease: 'power2.out' }); });
-      if (h3) card.addEventListener('mouseenter', function () { gsap.to(h3, { y: -6, duration: 0.4, ease: 'power2.out' }); });
-      if (h3) card.addEventListener('mouseleave', function () { gsap.to(h3, { y: 0, duration: 0.4, ease: 'power2.out' }); });
+      if (img) gsap.to(img, { scale: 1.08, duration: 0.7, ease: 'power2.out', overwrite: 'auto' });
+      if (h3) gsap.to(h3, { y: -6, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
+    }, function (card) {
+      var img = card.querySelector(CARD_MEDIA);
+      var h3 = card.querySelector('.overlay h3');
+      if (img) gsap.to(img, { scale: 1, duration: 0.8, ease: 'power2.out', overwrite: 'auto' });
+      if (h3) gsap.to(h3, { y: 0, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
     });
+
     // showcase 卡片：信息层滑入（scale 由 setupShowcaseHover 负责）
-    document.querySelectorAll('.showcase-card').forEach(function (card) {
+    delegateHover('.showcase-card', function (card) {
       var meta = card.querySelector('.sc-meta');
-      if (!meta) return;
-      card.addEventListener('mouseenter', function () { gsap.fromTo(meta, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }); });
-    });
+      if (meta) gsap.fromTo(meta, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
+    }, function () { /* 回正由 CSS :hover 负责 */ });
   }
 
   /* ---------- 文本类入场：kicker / quote / section-head ---------- */
@@ -583,9 +643,16 @@
     }, { threshold: 0.3 });
 
     // 各 section-head 内的子元素 stagger（showcase / hs / gallery / about / gear / contact）
+    // 注意：带 .split 的子元素（#contactTitle / .showcase-title）已由 split-reveal.js
+    // 做逐字动画，若这里再对它们整体做一次 y/opacity 位移就是双重入场，视觉上会「跳两下」。
     onEnterAll('.showcase-head, .hs-header, .gallery-head, .about-text, .gear-head, .contact .wrap', function (nodes) {
       nodes.forEach(function (head) {
-        gsap.from(head.children, { y: 22, opacity: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out' });
+        var kids = Array.prototype.filter.call(head.children, function (el) {
+          return !el.classList.contains('split');
+        });
+        if (kids.length) {
+          gsap.from(kids, { y: 22, opacity: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out' });
+        }
       });
     }, { threshold: 0.2 });
   }
@@ -595,22 +662,26 @@
     var dot = document.querySelector('.cursor-dot');
     if (!dot) return;
     var hoverSel = 'a, button, [data-magnetic], .card, .featured-img-wrap, .showcase-card, .hs-panel, .gear-item, .archive-row, .ci-link';
-    document.querySelectorAll(hoverSel).forEach(function (el) {
-      el.addEventListener('mouseenter', function () { gsap.to(dot, { scale: 1.8, duration: 0.3, ease: 'back.out(2)' }); });
-      el.addEventListener('mouseleave', function () { gsap.to(dot, { scale: 1, duration: 0.4, ease: 'power2.out' }); });
+    // 委托：原先对每个匹配元素都绑一对监听（.card 一张一个，长画廊下是数百个监听器）
+    delegateHover(hoverSel, function () {
+      gsap.to(dot, { scale: 1.8, duration: 0.3, ease: 'back.out(2)', overwrite: 'auto' });
+    }, function () {
+      gsap.to(dot, { scale: 1, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
     });
   }
 
   /* ---------- 锚点点击：目标区块轻微呼吸 ---------- */
   function setupAnchorBreath() {
-    document.querySelectorAll('a[href^="#"]').forEach(function (a) {
-      a.addEventListener('click', function () {
-        var id = a.getAttribute('href');
-        if (id.length <= 1) return;
-        var target = document.querySelector(id);
-        if (!target) return;
-        gsap.fromTo(target, { scale: 0.985 }, { scale: 1, duration: 0.6, ease: 'back.out(1.6)' });
-      });
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[href^="#"]');
+      if (!a) return;
+      var id = a.getAttribute('href');
+      if (id.length <= 1) return;
+      var target;
+      // href 可能是非法选择器（如 "#123"），包一层避免抛异常中断后续逻辑
+      try { target = document.querySelector(id); } catch (err) { return; }
+      if (!target) return;
+      gsap.fromTo(target, { scale: 0.985 }, { scale: 1, duration: 0.6, ease: 'back.out(1.6)' });
     });
   }
 
@@ -734,19 +805,36 @@
     var nodes = document.querySelectorAll(ER_SELECTOR);
     Array.prototype.forEach.call(nodes, attachEaseReverseUI);
 
-    // 覆盖动态注入的按钮 / 选择框（筛选下拉、分享面板等）
+    // 覆盖动态注入的按钮 / 选择框（筛选下拉、分享面板等）。
+    // 观察整棵子树，data.js 批量渲染画廊时会一次性涌入成百上千条 mutation，
+    // 因此在 rAF 里合并成一批再处理，避免每条记录都跑一次全量 querySelectorAll。
     if (typeof MutationObserver === 'undefined') return;
+    var pending = [];
+    var scheduled = false;
+
+    function flushPending() {
+      scheduled = false;
+      var batch = pending;
+      pending = [];
+      for (var i = 0; i < batch.length; i++) {
+        var n = batch[i];
+        if (!n.isConnected) continue;      // 已被移除的节点不必处理
+        if (n.matches(ER_SELECTOR)) attachEaseReverseUI(n);
+        var inner = n.querySelectorAll(ER_SELECTOR);
+        for (var k = 0; k < inner.length; k++) attachEaseReverseUI(inner[k]);
+      }
+    }
+
     var mo = new MutationObserver(function (muts) {
-      muts.forEach(function (m) {
-        m.addedNodes.forEach(function (n) {
-          if (n.nodeType !== 1) return;
-          if (n.matches && n.matches(ER_SELECTOR)) attachEaseReverseUI(n);
-          if (n.querySelectorAll) {
-            var inner = n.querySelectorAll(ER_SELECTOR);
-            Array.prototype.forEach.call(inner, attachEaseReverseUI);
-          }
-        });
-      });
+      for (var i = 0; i < muts.length; i++) {
+        var added = muts[i].addedNodes;
+        for (var k = 0; k < added.length; k++) {
+          if (added[k].nodeType === 1) pending.push(added[k]);
+        }
+      }
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(flushPending);
     });
     mo.observe(document.body, { childList: true, subtree: true });
   }

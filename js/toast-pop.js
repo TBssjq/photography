@@ -78,9 +78,12 @@
       );
     }
 
-    // 给页面主要版块绑定：进入视口时各弹一次（避免重复打扰）
+    // 给页面主要版块绑定：进入视口时各弹一次（避免重复打扰）。
+    // 修正：原先写的是 #quote / #gear / #archive / #testimonials，这四个 ID 在
+    // index.html 里并不存在（真实节点是 .quote-section / .gear-section，另两个压根没有），
+    // 等于这四个配置项一直是死配置。
     var sections = document.querySelectorAll(
-      '#featured, #showcase, #hsSection, #quote, #about, #gallery, #gear, #archive, #testimonials, #contact'
+      '#featured, #showcase, #hsSection, .quote-section, #about, #gallery, .gear-section, #contact'
     );
     sections.forEach(function (sec, i) {
       ScrollTrigger.create({

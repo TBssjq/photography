@@ -18,6 +18,13 @@
   var beeVelocity = new THREE.Vector3();
   var wanderTarget = new THREE.Vector3();
   var wanderTimer = 0;
+
+  /* 每帧都要用的临时对象，提到模块级复用：
+     原本在 updateBee 里逐帧 new Vector3/Vector3/Object3D，60fps 下每秒产生
+     上百个临时对象，是典型的 GC 抖动来源。 */
+  var _dir = new THREE.Vector3();
+  var _lookTarget = new THREE.Vector3();
+  var _dummy = new THREE.Object3D();
   var noiseOffset = Math.random() * 1000;
 
   /* 蜜蜂临时目标（点击文字时飞过去） */
@@ -171,23 +178,22 @@
     var noiseZ = Math.cos(t * 2) * 0.3;
 
     /* 丝滑移动 */
-    var dir = new THREE.Vector3().subVectors(target, bee.position);
-    if (dir.length() > 0.1) {
-      dir.normalize().multiplyScalar(speed);
-      beeVelocity.x = smoothLerp(beeVelocity.x, dir.x, 0.05, dt);
-      beeVelocity.y = smoothLerp(beeVelocity.y, dir.y + noiseY, 0.05, dt);
-      beeVelocity.z = smoothLerp(beeVelocity.z, dir.z + noiseZ, 0.05, dt);
+    _dir.subVectors(target, bee.position);
+    if (_dir.length() > 0.1) {
+      _dir.normalize().multiplyScalar(speed);
+      beeVelocity.x = smoothLerp(beeVelocity.x, _dir.x, 0.05, dt);
+      beeVelocity.y = smoothLerp(beeVelocity.y, _dir.y + noiseY, 0.05, dt);
+      beeVelocity.z = smoothLerp(beeVelocity.z, _dir.z + noiseZ, 0.05, dt);
     }
-    bee.position.add(beeVelocity.clone().multiplyScalar(dt * 60));
+    bee.position.addScaledVector(beeVelocity, dt * 60);
 
     /* 丝滑朝向 — 四元数 slerp */
     if (beeVelocity.length() > 0.3) {
-      var lookTarget = new THREE.Vector3().addVectors(bee.position, beeVelocity);
-      var dummy = new THREE.Object3D();
-      dummy.position.copy(bee.position);
-      dummy.lookAt(lookTarget);
-      dummy.rotateY(Math.PI / 2);
-      bee.quaternion.slerp(dummy.quaternion, 1 - Math.pow(0.82, dt * 60));
+      _lookTarget.addVectors(bee.position, beeVelocity);
+      _dummy.position.copy(bee.position);
+      _dummy.lookAt(_lookTarget);
+      _dummy.rotateY(Math.PI / 2);
+      bee.quaternion.slerp(_dummy.quaternion, 1 - Math.pow(0.82, dt * 60));
     }
 
     /* 翅膀拍打 — 正弦波 */
@@ -281,7 +287,8 @@
     element.style.transform = 'perspective(800px) rotateY(90deg) scale(0.95)';
 
     setTimeout(function () {
-      element.innerHTML = element.getAttribute('data-original-html');
+      // 取不到原始 HTML 时至少把翻转后的文案撤掉，避免 innerHTML = null 变成 "null" 文本
+      element.innerHTML = element.getAttribute('data-original-html') || '';
       element.classList.remove('flipped');
       void element.offsetWidth;
       element.style.transform = 'perspective(800px) rotateY(0deg) scale(1)';

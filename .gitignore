@@ -34,5 +34,10 @@ server.log
 # CodeBuddy 本地数据
 .codebuddy/
 
+# 冒烟测试临时 Chrome profile（scripts/smoke.mjs 生成）
+.smoke-chrome-profile/
+# 冒烟测试本地浏览器缓存（由 npx @puppeteer/browsers 下载，不入库）
+scripts/.chrome-bin/
+
 # Release 分发包（由 scripts/release.ps1 生成）
 release/
